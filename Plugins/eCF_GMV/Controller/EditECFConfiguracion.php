@@ -43,8 +43,8 @@ class EditECFConfiguracion extends EditController
                 $model->save();
             }
             
-            // Redirigir siempre a code=1 usando Tools::redirect para mayor fiabilidad
-            Tools::redirect(Tools::url('EditECFConfiguracion', ['code' => 1]));
+            // Redirigir siempre a code=1
+            $this->redirect(Tools::url('EditECFConfiguracion', ['code' => 1]));
             return;
         }
 

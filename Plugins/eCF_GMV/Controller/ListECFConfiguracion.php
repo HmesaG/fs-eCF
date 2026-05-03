@@ -28,8 +28,7 @@ class ListECFConfiguracion extends ListController
     public function privateCore(&$response, $user, $permissions): void
     {
         // Al haber solo un registro de configuración, redirigimos directamente al Edit
-        // Usamos Tools::redirect para evitar problemas con el objeto response en este punto
-        Tools::redirect(Tools::url('EditECFConfiguracion', ['code' => 1]));
+        $this->redirect(Tools::url('EditECFConfiguracion', ['code' => 1]));
     }
 
     protected function createViews()
