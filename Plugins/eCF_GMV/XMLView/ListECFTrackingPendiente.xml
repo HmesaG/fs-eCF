@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <column name="fecha-envio" title="Fecha Envío" order="100">
+            <widget type="datetime" fieldname="fecha_envio"/>
+        </column>
+        <column name="encf" title="e-NCF" order="110">
+            <widget type="text" fieldname="encf"/>
+        </column>
+        <column name="trackid" title="TrackID" order="120">
+            <widget type="text" fieldname="trackid"/>
+        </column>
+        <column name="estado" title="Estado" order="130">
+            <widget type="text" fieldname="estado"/>
+        </column>
+        <column name="intentos" order="140" numcolumns="1">
+            <widget type="number" fieldname="intentos"/>
+        </column>
+        <column name="resuelto" order="150">
+            <widget type="checkbox" fieldname="resuelto" readonly="true"/>
+        </column>
+    </columns>
+    <rows>
+        <row type="status">
+            <option color="success" fieldname="resuelto" title="Resuelto">true</option>
+            <option color="warning" fieldname="resuelto" title="Pendiente">false</option>
+        </row>
+    </rows>
+</view>

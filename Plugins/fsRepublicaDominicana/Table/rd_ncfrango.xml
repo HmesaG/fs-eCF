@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Document   : rd_ncfrango.xml
+    Description:
+        Estructura de la tabla rd_ncfrango.
+-->
+<table>
+    <column>
+        <name>autorizacion</name>
+        <type>bigint</type>
+    </column>
+    <column>
+        <name>areaimpresion</name>
+        <type>character varying(3)</type>
+    </column>
+    <column>
+        <name>codalmacen</name>
+        <type>character varying(4)</type>
+    </column>
+    <column>
+        <name>contado</name>
+        <type>boolean</type>
+    </column>
+    <column>
+        <name>correlativo</name>
+        <type>integer</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>division</name>
+        <type>character varying(2)</type>
+    </column>
+    <column>
+        <name>estado</name>
+        <type>boolean</type>
+    </column>
+    <column>
+        <name>fechacreacion</name>
+        <type>date</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>fechamodificacion</name>
+        <type>date</type>
+    </column>
+    <column>
+        <name>fechavencimiento</name>
+        <type>date</type>
+    </column>
+    <column>
+        <name>id</name>
+        <type>serial</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>idempresa</name>
+        <type>integer</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>puntoemision</name>
+        <type>character varying(3)</type>
+    </column>
+    <column>
+        <name>secuenciafin</name>
+        <type>integer</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>secuenciainicio</name>
+        <type>integer</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>serie</name>
+        <type>character varying(1)</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>solicitud</name>
+        <type>bigint</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>tipocomprobante</name>
+        <type>character varying(2)</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>usuariocreacion</name>
+        <type>character varying(50)</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>usuariomodificacion</name>
+        <type>character varying(50)</type>
+    </column>
+    <constraint>
+        <name>pkey_ncf_rango</name>
+        <type>PRIMARY KEY (id)</type>
+    </constraint>
+    <constraint>
+        <name>uniq_id_ncf_rango</name>
+        <type>UNIQUE (id,idempresa)</type>
+    </constraint>
+</table>

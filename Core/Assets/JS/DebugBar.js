@@ -1,0 +1,1 @@
+function hideAllDebugBar(){return $(".debugbar ul li a.active").removeClass("active"),$(".debugbar-section").hide("fast"),!1}function showDebugBarSection(e){return hideAllDebugBar(),$("#debugbarBtn"+e).addClass("active"),$("#debugbarSection"+e).show("fast"),!1}

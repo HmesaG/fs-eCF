@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="general" title="Estado del Tracking" numcolumns="12">
+            <column name="id" numcolumns="2" order="100">
+                <widget type="number" fieldname="id" icon="fa-solid fa-hashtag" readonly="dinamic"/>
+            </column>
+            <column name="resuelto" numcolumns="2" order="110">
+                <widget type="checkbox" fieldname="resuelto"/>
+            </column>
+            <column name="encf" title="e-NCF" numcolumns="4" order="120">
+                <widget type="text" fieldname="encf" readonly="true"/>
+            </column>
+            <column name="trackid" title="TrackID" numcolumns="4" order="130">
+                <widget type="text" fieldname="trackid" readonly="true"/>
+            </column>
+            <column name="estado" title="Estado DGII" numcolumns="4" order="140">
+                <widget type="text" fieldname="estado" readonly="true"/>
+            </column>
+            <column name="intentos" numcolumns="2" order="150">
+                <widget type="number" fieldname="intentos" readonly="true"/>
+            </column>
+        </group>
+        <group name="info" title="Información Adicional" numcolumns="12">
+            <column name="fecha-envio" title="Fecha Envío" numcolumns="4" order="100">
+                <widget type="datetime" fieldname="fecha_envio" readonly="true"/>
+            </column>
+            <column name="fecha-consulta" title="Última Consulta" numcolumns="4" order="110">
+                <widget type="datetime" fieldname="fecha_ultima_consulta" readonly="true"/>
+            </column>
+            <column name="rnc-emisor" title="RNC Emisor" numcolumns="4" order="120">
+                <widget type="text" fieldname="rnc_emisor" readonly="true"/>
+            </column>
+            <column name="referencia-local" title="Referencia Local" numcolumns="6" order="130">
+                <widget type="text" fieldname="referencia_local" readonly="true"/>
+            </column>
+            <column name="tipo-documento" title="Tipo Documento" numcolumns="6" order="140">
+                <widget type="text" fieldname="tipo_documento" readonly="true"/>
+            </column>
+        </group>
+        <group name="mensaje" title="Último Mensaje" numcolumns="12">
+            <column name="ultimo-mensaje" title="Detalle del Estado/Error" numcolumns="12" order="100">
+                <widget type="textarea" fieldname="ultimo_mensaje" readonly="true"/>
+            </column>
+        </group>
+    </columns>
+</view>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="general" title="Configuración e-CF" numcolumns="12">
+            <column name="id" numcolumns="2" order="100">
+                <widget type="number" fieldname="id" icon="fa-solid fa-hashtag" readonly="dinamic"/>
+            </column>
+            <column name="activo" numcolumns="2" order="110">
+                <widget type="checkbox" fieldname="activo"/>
+            </column>
+            <column name="ambiente" numcolumns="4" order="120">
+                <widget type="select" fieldname="ambiente">
+                    <values title="TesteCF" ref="TesteCF"/>
+                    <values title="eCF (Producción)" ref="eCF"/>
+                </widget>
+            </column>
+            <column name="timeout" title="Timeout (seg)" numcolumns="2" order="130">
+                <widget type="number" fieldname="timeout_segundos"/>
+            </column>
+            <column name="reintentos" title="Reintentos Máx." numcolumns="2" order="140">
+                <widget type="number" fieldname="reintentos_maximos"/>
+            </column>
+        </group>
+        <group name="urls" title="URLs DGII" numcolumns="12">
+            <column name="url-test" title="URL Base Test e-CF" numcolumns="6" order="100">
+                <widget type="text" fieldname="url_base_testecf"/>
+            </column>
+            <column name="url-prod" title="URL Base e-CF (Prod)" numcolumns="6" order="110">
+                <widget type="text" fieldname="url_base_ecf"/>
+            </column>
+            <column name="url-rfce-test" title="URL RFCE Test" numcolumns="6" order="120">
+                <widget type="text" fieldname="url_rfce_test"/>
+            </column>
+            <column name="url-rfce-prod" title="URL RFCE Prod" numcolumns="6" order="130">
+                <widget type="text" fieldname="url_rfce_prod"/>
+            </column>
+        </group>
+        <group name="certificado" title="Certificado Digital" numcolumns="12">
+            <column name="ruta-cert" title="Ruta Certificado .p12" numcolumns="8" order="100">
+                <widget type="text" fieldname="ruta_certificado_p12" icon="fa-solid fa-file-certificate" readonly="true"/>
+            </column>
+            <column name="pass-cert" title="Password Certificado" numcolumns="4" order="110">
+                <widget type="password" fieldname="password_certificado"/>
+            </column>
+        </group>
+        <group name="info-cert" title="Información del Certificado" numcolumns="12">
+            <column name="cert-sujeto" title="Titular (CN)" numcolumns="6" order="100">
+                <widget type="text" fieldname="cert_sujeto" icon="fa-solid fa-user-shield" readonly="true"/>
+            </column>
+            <column name="cert-emisor" title="Emisor" numcolumns="6" order="110">
+                <widget type="text" fieldname="cert_emisor" icon="fa-solid fa-building" readonly="true"/>
+            </column>
+            <column name="cert-vencimiento" title="Fecha de Vencimiento" numcolumns="4" order="120">
+                <widget type="date" fieldname="cert_vencimiento" icon="fa-solid fa-calendar-xmark" readonly="true"/>
+            </column>
+        </group>
+    </columns>
+    <rows>
+        <row type="footer">
+            <group name="footer-actions" footer="specials-actions">
+            </group>
+        </row>
+    </rows>
+    <modals>
+        <group name="upload-cert" title="Subir Certificado Digital .p12" icon="fas fa-upload">
+            <column name="cert-file" title="Seleccionar archivo .p12" numcolumns="8">
+                <widget type="file" fieldname="cert_file" accept=".p12"/>
+            </column>
+            <column name="pass-cert-modal" title="Password del Certificado" numcolumns="4">
+                <widget type="password" fieldname="password_certificado_modal"/>
+            </column>
+        </group>
+    </modals>
+</view>

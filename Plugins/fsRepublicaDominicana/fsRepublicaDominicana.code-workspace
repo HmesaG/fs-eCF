@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../Sites/fs"
+		}
+	],
+	"settings": {
+		"intelephense.environment.includePaths": [
+			"/users/joenilson/Sites/fs/"
+		],
+		"intelephense.environment.phpVersion": "7.4.0"
+	}
+}

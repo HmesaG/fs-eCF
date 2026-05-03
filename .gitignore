@@ -1,0 +1,25 @@
+# Dependencies
+vendor/
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Private/Test data
+*.p12
+eCF_GMV_test/
+scratch/
+20240703-1500447-A5GFP98SJ.p12
+
+# FacturaScripts
+/config.php
+/MyFiles/
+/Storage/
+/Tmp/
+/cache/
+/logs/
+
+# ZIPs (optional, but usually ignored in git)
+# eCF_GMV.zip
+# PlantillasPDF.zip

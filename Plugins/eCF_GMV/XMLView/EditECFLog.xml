@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="general" title="Detalles del Envío" numcolumns="12">
+            <column name="id" numcolumns="2" order="100">
+                <widget type="number" fieldname="id" icon="fa-solid fa-hashtag" readonly="dinamic"/>
+            </column>
+            <column name="fecha" numcolumns="4" order="110">
+                <widget type="datetime" fieldname="fecha" readonly="true"/>
+            </column>
+            <column name="tipo" numcolumns="3" order="120">
+                <widget type="text" fieldname="tipo" readonly="true"/>
+            </column>
+            <column name="http-code" title="HTTP Code" numcolumns="2" order="130">
+                <widget type="number" fieldname="http_code" readonly="true"/>
+            </column>
+            <column name="referencia" numcolumns="6" order="140">
+                <widget type="text" fieldname="referencia" readonly="true"/>
+            </column>
+        </group>
+        <group name="contenido" title="Contenido del Envío" numcolumns="12">
+            <column name="peticion" title="Petición (XML/JSON)" numcolumns="6" order="100">
+                <widget type="textarea" fieldname="peticion" readonly="true"/>
+            </column>
+            <column name="respuesta" title="Respuesta DGII" numcolumns="6" order="110">
+                <widget type="textarea" fieldname="respuesta" readonly="true"/>
+            </column>
+        </group>
+    </columns>
+</view>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menu>
+    <item>
+        <name>ecf_gmv</name>
+        <label>e-CF</label>
+        <icon>fas fa-file-invoice-dollar</icon>
+        <order>100</order>
+        <item>
+            <name>ecf_configuracion</name>
+            <label>Configuración</label>
+            <controller>ListECFConfiguracion</controller>
+        </item>
+        <item>
+            <name>ecf_log</name>
+            <label>Envíos</label>
+            <controller>ListECFLog</controller>
+        </item>
+        <item>
+            <name>ecf_tracking_pendiente</name>
+            <label>Pendientes</label>
+            <controller>ListECFTrackingPendiente</controller>
+        </item>
+    </item>
+</menu>

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eCF-GMV — Plugin de Facturación Electrónica DGII</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #0f1628;
+    --card: #141c2e;
+    --border: #1e2d4a;
+    --accent: #3b82f6;
+    --accent2: #6366f1;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --gradient: linear-gradient(135deg, #3b82f6, #6366f1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; line-height: 1.6; }
+
+  /* HERO */
+  .hero {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse, rgba(59,130,246,.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(59,130,246,.15);
+    border: 1px solid rgba(59,130,246,.4);
+    color: #93c5fd;
+    font-size: 12px; font-weight: 600;
+    padding: 4px 14px; border-radius: 999px;
+    margin-bottom: 20px; letter-spacing: .5px;
+  }
+  .badge span { width: 7px; height: 7px; background: #3b82f6; border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 14px; }
+  .hero p { color: var(--muted); font-size: 1.05rem; max-width: 600px; margin: 0 auto 30px; }
+  .hero-meta { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+  .hero-meta span { font-size: 13px; color: #94a3b8; display: flex; align-items: center; gap: 6px; }
+  .hero-meta strong { color: var(--text); }
+
+  /* LAYOUT */
+  .container { max-width: 1100px; margin: 0 auto; padding: 50px 24px; }
+
+  /* SECTION TITLE */
+  .section-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* FEATURE GRID */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 20px; margin-bottom: 50px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    transition: transform .2s, border-color .2s, box-shadow .2s;
+    position: relative; overflow: hidden;
+  }
+  .card:hover { transform: translateY(-3px); border-color: #2d4070; box-shadow: 0 8px 30px rgba(0,0,0,.4); }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gradient); }
+  .card-icon { font-size: 2rem; margin-bottom: 14px; }
+  .card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; color: #f1f5f9; }
+  .card p { font-size: .875rem; color: var(--muted); }
+  .card ul { list-style: none; margin-top: 10px; }
+  .card ul li { font-size: .82rem; color: #94a3b8; padding: 3px 0; display: flex; align-items: flex-start; gap: 7px; }
+  .card ul li::before { content: '›'; color: var(--accent); font-weight: 700; margin-top: 1px; flex-shrink: 0; }
+
+  /* FLOW */
+  .flow { display: flex; flex-direction: column; gap: 0; margin-bottom: 50px; }
+  .flow-step {
+    display: flex; align-items: flex-start; gap: 20px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 24px; margin-bottom: 8px;
+    transition: border-color .2s;
+  }
+  .flow-step:hover { border-color: #2d4070; }
+  .step-num {
+    min-width: 36px; height: 36px;
+    background: var(--gradient);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: .85rem; flex-shrink: 0;
+  }
+  .step-body h4 { font-size: .95rem; font-weight: 600; margin-bottom: 4px; }
+  .step-body p { font-size: .82rem; color: var(--muted); }
+  .step-body code { font-size: .78rem; background: rgba(59,130,246,.1); color: #93c5fd; padding: 1px 7px; border-radius: 4px; }
+
+  /* FILES TABLE */
+  .table-wrap { overflow-x: auto; margin-bottom: 50px; }
+  table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+  thead th { background: #0d1525; color: #64748b; font-weight: 600; font-size: .75rem; text-transform: uppercase; letter-spacing: .5px; padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+  tbody tr { border-bottom: 1px solid rgba(30,45,74,.6); transition: background .15s; }
+  tbody tr:hover { background: rgba(59,130,246,.05); }
+  tbody td { padding: 11px 16px; color: #cbd5e1; vertical-align: top; }
+  tbody td:first-child { color: #93c5fd; font-family: monospace; font-size: .8rem; white-space: nowrap; }
+  .tag { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 9px; border-radius: 999px; }
+  .tag-core { background: rgba(99,102,241,.2); color: #a5b4fc; }
+  .tag-model { background: rgba(16,185,129,.15); color: #6ee7b7; }
+  .tag-lib { background: rgba(245,158,11,.15); color: #fcd34d; }
+  .tag-ext { background: rgba(239,68,68,.15); color: #fca5a5; }
+  .tag-cron { background: rgba(59,130,246,.15); color: #93c5fd; }
+
+  /* ESTADOS */
+  .estados { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 50px; }
+  .estado-card { flex: 1; min-width: 160px; border-radius: 10px; padding: 16px 18px; border: 1px solid; }
+  .e0 { background: rgba(100,116,139,.1); border-color: rgba(100,116,139,.3); }
+  .e1 { background: rgba(16,185,129,.08); border-color: rgba(16,185,129,.3); }
+  .e2 { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.3); }
+  .e3 { background: rgba(245,158,11,.08); border-color: rgba(245,158,11,.3); }
+  .e4 { background: rgba(99,102,241,.08); border-color: rgba(99,102,241,.3); }
+  .estado-card .num { font-size: 1.5rem; font-weight: 800; }
+  .e0 .num { color: #94a3b8; }
+  .e1 .num { color: var(--green); }
+  .e2 .num { color: var(--red); }
+  .e3 .num { color: var(--yellow); }
+  .e4 .num { color: #a5b4fc; }
+  .estado-card .label { font-size: .8rem; font-weight: 600; color: var(--text); margin-top: 2px; }
+  .estado-card .desc { font-size: .75rem; color: var(--muted); margin-top: 4px; }
+
+  /* FOOTER */
+  footer { border-top: 1px solid var(--border); padding: 30px 40px; text-align: center; color: var(--muted); font-size: .8rem; }
+  footer strong { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge"><span></span> FacturaScripts Plugin · v1.0</div>
+  <h1>eCF-GMV</h1>
+  <p>Plugin de Facturación Electrónica para la DGII de República Dominicana. Firma digital XMLDSig, comunicación REST y polling automático de estados.</p>
+  <div class="hero-meta">
+    <span>🏗️ Requiere <strong>fsRepublicaDominicana</strong></span>
+    <span>🌐 Ambiente <strong>TesteCF / eCF</strong></span>
+    <span>🔒 Firma <strong>RSA-SHA256</strong></span>
+    <span>🤖 Cron <strong>cada 15 min</strong></span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- FUNCIONES PRINCIPALES -->
+  <h2 class="section-title">⚡ Funciones Principales</h2>
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-icon">🔐</div>
+      <h3>Firma Digital XMLDSig</h3>
+      <p>Firma los documentos XML con el certificado digital .p12 de la empresa usando RSA-SHA256 enveloped.</p>
+      <ul>
+        <li>Lee el certificado .p12 con openssl</li>
+        <li>Calcula digest SHA-256 del contenido</li>
+        <li>Canonicalización C14N del XML</li>
+        <li>Inserta el nodo &lt;Signature&gt; estándar W3C</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🌐</div>
+      <h3>Comunicación con API DGII</h3>
+      <p>Servicio HTTP centralizado para todas las operaciones contra los endpoints de DGII.</p>
+      <ul>
+        <li>Autenticación JWT con caché de 55 min</li>
+        <li>Envío de e-CF (POST /api/ECF)</li>
+        <li>Consulta de estado por TrackId</li>
+        <li>Soporte TesteCF y eCF (producción)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">📄</div>
+      <h3>Generación de XML e-CF</h3>
+      <p>Motor de construcción del XML oficial requerido por DGII, sin nodos vacíos y con formato exacto.</p>
+      <ul>
+        <li>Tipo 31: Factura de Crédito Fiscal</li>
+        <li>Tipo 32: Factura Consumidor Final</li>
+        <li>Tipo 33: Nota de Débito</li>
+        <li>Tipo 34: Nota de Crédito</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🧾</div>
+      <h3>Soporte RFCE</h3>
+      <p>Detecta automáticamente cuando una factura consumidor (E32) debe enviarse por el flujo RFCE sincrónico.</p>
+      <ul>
+        <li>Umbral: facturas &lt; RD$250,000</li>
+        <li>Endpoint RFCE independiente</li>
+        <li>e-NCF asignado por DGII en respuesta</li>
+        <li>Sin TrackId ni polling posterior</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🖨️</div>
+      <h3>Impresión PDF con QR</h3>
+      <p>Genera la representación impresa del e-CF según la normativa oficial de la DGII.</p>
+      <ul>
+        <li>Código QR con URL de verificación y código de seguridad</li>
+        <li>Información del comprobante electrónico completa</li>
+        <li>Libre de dependencias de plugins externos (Usa core FS)</li>
+        <li>Botón integrado en la vista de edición</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">⏱️</div>
+      <h3>Cron — Polling Automático</h3>
+      <p>Tarea programada que re-consulta cada 15 minutos las facturas en estado "En Proceso".</p>
+      <ul>
+        <li>Cola en tabla ecf_tracking_pendiente</li>
+        <li>Actualiza el estado en FacturaCliente</li>
+        <li>Marca como resuelto al estado final</li>
+        <li>Límite configurable de reintentos</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h3>Log de Comunicaciones</h3>
+      <p>Registro completo de todas las peticiones y respuestas para auditoría y diagnóstico.</p>
+      <ul>
+        <li>Guarda XML enviado y respuesta DGII</li>
+        <li>Código HTTP de cada operación</li>
+        <li>Tipos: ENVIO_ECF, AUTH_TOKEN, RFCE, CONSULTA</li>
+        <li>Tabla ecf_log accesible desde FacturaScripts</li>
+      </ul>
+    </div>
+
+  </div>
+
+  </div>
+
+  <!-- GUÍA DE PRUEBAS -->
+  <h2 class="section-title">🧪 Guía de Pruebas (Paso a Paso)</h2>
+  <div class="grid">
+    <div class="card" style="border-top: 3px solid var(--yellow);">
+      <div class="card-icon">🛠️</div>
+      <h3>1. Preparación</h3>
+      <p>Asegúrate de que los cimientos estén listos antes de enviar tu primer e-CF.</p>
+      <ul>
+        <li>Instala el plugin <strong>fsRepublicaDominicana</strong>.</li>
+        <li>Verifica que el entorno tenga <strong>OpenSSL</strong> habilitado en PHP.</li>
+        <li>Ten a mano un certificado <strong>.p12</strong> válido (o de prueba).</li>
+      </ul>
+    </div>
+
+    <div class="card" style="border-top: 3px solid var(--accent);">
+      <div class="card-icon">⚙️</div>
+      <h3>2. Configuración</h3>
+      <p>Ve a <strong>Menú > e-CF > Configuración</strong> y completa los datos maestros.</p>
+      <ul>
+        <li><strong>Ambiente:</strong> Cámbialo a <code>TesteCF</code> (Sandbox de DGII).</li>
+        <li><strong>Certificado:</strong> Sube tu archivo .p12 y escribe la contraseña.</li>
+        <li><strong>URLs:</strong> Asegúrate de que las URLs apunten a <code>testecf.dgii.gov.do</code>.</li>
+      </ul>
+    </div>
+
+    <div class="card" style="border-top: 3px solid var(--green);">
+      <div class="card-icon">👤</div>
+      <h3>3. Cliente de Prueba</h3>
+      <p>Crea un cliente con datos válidos para que DGII no rechace la factura.</p>
+      <ul>
+        <li><strong>RNC:</strong> Usa uno válido (ej: <code>101641262</code> para pruebas).</li>
+        <li><strong>Régimen:</strong> Asegúrate de que el cliente sea de <strong>Crédito Fiscal</strong>.</li>
+        <li><strong>Email:</strong> (Opcional) para pruebas de recepción.</li>
+      </ul>
+    </div>
+
+    <div class="card" style="border-top: 3px solid var(--accent2);">
+      <div class="card-icon">📝</div>
+      <h3>4. Generar Factura</h3>
+      <p>Crea una nueva factura de venta y observa la secuencia.</p>
+      <ul>
+        <li>El NCF debe empezar con <strong>E</strong> (ej: <code>E310000000001</code>).</li>
+        <li>Agrega ítems con sus impuestos correctamente configurados (ITBIS).</li>
+        <li><strong>Guarda la factura</strong> para habilitar los botones de acción.</li>
+      </ul>
+    </div>
+
+    <div class="card" style="border-top: 3px solid var(--green);">
+      <div class="card-icon">🚀</div>
+      <h3>5. El Momento Crítico</h3>
+      <p>Dentro de la factura guardada, busca el botón azul en la barra superior.</p>
+      <ul>
+        <li>Presiona <strong>"Enviar e-CF a DGII"</strong>.</li>
+        <li>El sistema mostrará un mensaje de éxito o el error retornado por DGII.</li>
+        <li>Si es exitoso, verás el <strong>TrackId</strong> o <strong>NCF</strong> asignado.</li>
+      </ul>
+    </div>
+
+    <div class="card" style="border-top: 3px solid var(--muted);">
+      <div class="card-icon">🔍</div>
+      <h3>6. Verificación</h3>
+      <p>Si algo falla o quieres ver qué pasó detrás de escena.</p>
+      <ul>
+        <li>Revisa <strong>Menú > e-CF > Log de Comunicaciones</strong>.</li>
+        <li>Busca el error en la respuesta XML de la DGII.</li>
+        <li>Consulta <strong>Tracking Pendiente</strong> si la factura quedó "En Proceso".</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CONSEJOS PRO -->
+  <div class="card" style="background: linear-gradient(rgba(59,130,246,.1), rgba(99,102,241,.1)); border: 1px solid var(--accent); margin-bottom: 50px;">
+    <h3 style="color: var(--accent); display: flex; align-items: center; gap: 10px;">💡 Consejos para el Éxito</h3>
+    <p style="margin-top: 10px; font-size: 0.9rem;">
+      • <strong>Ambiente de Prueba:</strong> No uses datos reales en TesteCF si no quieres "ensuciar" tus secuencias.<br>
+      • <strong>Errores de Firma:</strong> Si recibes errores de "Firma Inválida", verifica que la contraseña del .p12 sea correcta.<br>
+      • <strong>ITBIS:</strong> Asegúrate de que los porcentajes de impuestos coincidan exactamente con los que DGII espera (18%, 16%, etc).
+    </p>
+  </div>
+
+  <!-- ESTADOS DGII -->
+  <h2 class="section-title">🚦 Estados de Respuesta DGII</h2>
+  <div class="estados">
+    <div class="estado-card e0"><div class="num">0</div><div class="label">No Encontrado</div><div class="desc">El e-NCF no existe en DGII aún.</div></div>
+    <div class="estado-card e1"><div class="num">1</div><div class="label">Aceptado</div><div class="desc">e-CF válido y registrado correctamente.</div></div>
+    <div class="estado-card e2"><div class="num">2</div><div class="label">Rechazado</div><div class="desc">Error en datos. Requiere corrección.</div></div>
+    <div class="estado-card e3"><div class="num">3</div><div class="label">En Proceso</div><div class="desc">DGII lo está validando. Cron re-consulta.</div></div>
+    <div class="estado-card e4"><div class="num">4</div><div class="label">Aceptado Cond.</div><div class="desc">Aceptado con observaciones menores.</div></div>
+  </div>
+
+  <!-- ARCHIVOS DEL PLUGIN -->
+  <h2 class="section-title">📁 Archivos del Plugin</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Archivo</th><th>Tipo</th><th>Descripción</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>facturascripts.ini</td><td><span class="tag tag-core">Core</span></td><td>Metadatos: nombre, versión, dependencia en fsRepublicaDominicana</td></tr>
+        <tr><td>Init.php</td><td><span class="tag tag-core">Core</span></td><td>Punto de entrada: carga extensiones y crea configuración inicial en BD</td></tr>
+        <tr><td>Cron.php</td><td><span class="tag tag-cron">Cron</span></td><td>Polling cada 15 min de facturas con estado "En Proceso" (estado 3)</td></tr>
+        <tr><td>Lib/EmisorECF.php</td><td><span class="tag tag-lib">Lib</span></td><td>Orquestador principal: genera → firma → envía → encola pendientes</td></tr>
+        <tr><td>Lib/DGII/DgiiApiService.php</td><td><span class="tag tag-lib">Lib</span></td><td>Cliente HTTP DGII: auth JWT, envío ECF, consulta estado, RFCE</td></tr>
+        <tr><td>Lib/DGII/DgiiXmlFirmador.php</td><td><span class="tag tag-lib">Lib</span></td><td>Firma XMLDSig RSA-SHA256 enveloped usando certificado .p12</td></tr>
+        <tr><td>Lib/DGII/DgiiXmlGenerador.php</td><td><span class="tag tag-lib">Lib</span></td><td>Constructor de XML oficial DGII para tipos E31, E32, E33, E34</td></tr>
+        <tr><td>Model/ECFConfiguracion.php</td><td><span class="tag tag-model">Model</span></td><td>Tabla ecf_configuracion: URLs, certificado, ambiente, timeout</td></tr>
+        <tr><td>Model/ECFLog.php</td><td><span class="tag tag-model">Model</span></td><td>Tabla ecf_log: audit trail de cada llamada a la API DGII</td></tr>
+        <tr><td>Model/ECFTrackingPendiente.php</td><td><span class="tag tag-model">Model</span></td><td>Tabla ecf_tracking_pendiente: cola de polling para el Cron</td></tr>
+        <tr><td>Extension/Controller/EditFacturaCliente.php</td><td><span class="tag tag-ext">Extension</span></td><td>Hook en la pantalla de factura para capturar la acción "enviar-ecf"</td></tr>
+        <tr><td>Translation/es_DO.json</td><td><span class="tag tag-core">Core</span></td><td>Traducciones en español dominicano de todos los mensajes del plugin</td></tr>
+        <tr><td>Table/ecf_configuracion.xml</td><td><span class="tag tag-model">Model</span></td><td>Definición de tabla para auto-creación en instalación del plugin</td></tr>
+        <tr><td>Table/ecf_log.xml</td><td><span class="tag tag-model">Model</span></td><td>Definición de tabla de logs de comunicaciones</td></tr>
+        <tr><td>Table/ecf_tracking_pendiente.xml</td><td><span class="tag tag-model">Model</span></td><td>Definición de tabla de seguimiento de e-CF pendientes</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer>
+  Plugin <strong>eCF-GMV</strong> v1.0 · Desarrollado por GMV · Integración DGII República Dominicana · FacturaScripts
+</footer>
+
+</body>
+</html>

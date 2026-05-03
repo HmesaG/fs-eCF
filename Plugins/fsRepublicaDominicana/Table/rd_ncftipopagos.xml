@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Document   : rd_ncftipopagos.xml
+    Description:
+        Estructura de la tabla rd_ncftipopagos.
+-->
+<table>
+    <column>
+        <name>tipopago</name>
+        <type>character varying(2)</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>codigo</name>
+        <type>character varying(2)</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>descripcion</name>
+        <type>character varying(180)</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>estado</name>
+        <type>boolean</type>
+        <null>YES</null>
+    </column>
+    <constraint>
+        <name>pkey_ncftipopagos</name>
+        <type>PRIMARY KEY (tipopago, codigo)</type>
+    </constraint>
+</table>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <column name="fecha" order="100">
+            <widget type="datetime" fieldname="fecha"/>
+        </column>
+        <column name="tipo" order="110">
+            <widget type="text" fieldname="tipo"/>
+        </column>
+        <column name="referencia" order="120">
+            <widget type="text" fieldname="referencia"/>
+        </column>
+        <column name="http-code" title="HTTP" numcolumns="1" order="130">
+            <widget type="number" fieldname="http_code"/>
+        </column>
+    </columns>
+    <rows>
+        <row type="status">
+            <option color="success" fieldname="http_code" title="OK">200</option>
+            <option color="warning" fieldname="http_code" title="Parcial">206</option>
+            <option color="danger" fieldname="http_code" title="Error">0</option>
+        </row>
+    </rows>
+</view>
