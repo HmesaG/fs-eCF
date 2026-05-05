@@ -78,7 +78,7 @@ class ECFConfiguracion extends ModelClass
         // Limpieza de seguridad: borrar cualquier registro con ID > 1
         $db->exec("DELETE FROM " . self::tableName() . " WHERE id > 1");
 
-        // Obtenemos los datos a guardar usando las propiedades públicas del modelo
+        // Preparar datos a guardar
         $data = [
             'id'                   => 1,
             'ambiente'             => $this->ambiente,
@@ -98,22 +98,38 @@ class ECFConfiguracion extends ModelClass
             'cert_vencimiento'     => $this->cert_vencimiento,
         ];
 
-        // Comprobar si existe el ID 1
+        // Verificar si existe el ID 1
         $existe = $db->select("SELECT id FROM " . self::tableName() . " WHERE id = 1");
 
         if (!empty($existe)) {
-            // Si existe, actualizamos (sin el campo id)
-            $dataUpdate = $data;
-            unset($dataUpdate['id']);
-            return $db->update(self::tableName(), $dataUpdate, ['id' => 1]);
+            // ACTUALIZAR - Construir SQL manualmente
+            $sql = "UPDATE " . self::tableName() . " SET "
+                . "ambiente = " . $db->escape($this->ambiente) . ", "
+                . "rnc_emisor = " . $db->escape($this->rnc_emisor) . ", "
+                . "razon_social = " . $db->escape($this->razon_social) . ", "
+                . "url_base_testecf = " . $db->escape($this->url_base_testecf) . ", "
+                . "url_base_ecf = " . $db->escape($this->url_base_ecf) . ", "
+                . "url_rfce_test = " . $db->escape($this->url_rfce_test) . ", "
+                . "url_rfce_prod = " . $db->escape($this->url_rfce_prod) . ", "
+                . "ruta_certificado_p12 = " . $db->escape($this->ruta_certificado_p12) . ", "
+                . "password_certificado = " . $db->escape($this->password_certificado) . ", "
+                . "timeout_segundos = " . $db->escape($this->timeout_segundos) . ", "
+                . "reintentos_maximos = " . $db->escape($this->reintentos_maximos) . ", "
+                . "activo = " . ($this->activo ? 1 : 0) . ", "
+                . "cert_sujeto = " . $db->escape($this->cert_sujeto) . ", "
+                . "cert_emisor = " . $db->escape($this->cert_emisor) . ", "
+                . "cert_vencimiento = " . $db->escape($this->cert_vencimiento)
+                . " WHERE id = 1";
+
+            return $db->exec($sql);
         }
 
-        // Si no existe, insertamos manualmente para garantizar el ID 1
+        // INSERTAR - Si no existe
         $columns = [];
-        $values  = [];
+        $values = [];
         foreach ($data as $key => $value) {
             $columns[] = $key;
-            $values[]  = $db->escape($value);
+            $values[] = $db->escape($value);
         }
 
         $sql = "INSERT INTO " . self::tableName() . " (" . implode(',', $columns) . ") VALUES (" . implode(',', $values) . ")";
