@@ -136,56 +136,49 @@ class EditECFConfiguracion extends EditController
             return true;
         }
 
-        // Validar extensión
         $extension = strtolower($uploadFile->getClientOriginalExtension());
         if ($extension !== 'p12') {
-            Tools::log()->error('Solo se permiten archivos con extensión .p12');
+            Tools::log()->error('Solo se permiten archivos .p12');
             return true;
         }
 
-        // Leer la contraseña (del modal o de la BD si ya existe)
-        $password = (string)$this->request->request->get('password_certificado_modal');
-        if ($password === '') {
-            $model = $this->getModel();
-            $password = (string)$model->password_certificado;
-        }
+        // Obtener contraseña de la configuración actual
+        $model = $this->getModel();
+        $password = (string)$model->password_certificado;
 
-        // Carpeta destino
-        $certDir = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, self::CERT_DIR);
-        $destDir = FS_FOLDER . DIRECTORY_SEPARATOR . $certDir;
-
-        if (!is_dir($destDir) && !mkdir($destDir, 0755, true)) {
-            Tools::log()->error('Error: No se pudo crear la carpeta ' . $destDir);
+        if (empty($password)) {
+            Tools::log()->error('Debe configurar la contraseña del certificado antes de subirlo.');
             return true;
         }
 
-        $filename = preg_replace('/[^a-zA-Z0-9_\-\.]/', '_', $uploadFile->getClientOriginalName());
-        $destPath = $destDir . $filename;
-
-        // Validar el certificado antes de moverlo definitivamente
+        // Validar el certificado con la contraseña guardada
         $certInfo = $this->readCertificateInfo($uploadFile->getPathname(), $password);
         if (false === $certInfo) {
             Tools::log()->error('Error al validar certificado: ' . $this->lastOpenSSLError);
             return true;
         }
 
-        if (false === move_uploaded_file($uploadFile->getPathname(), $destPath)) {
-            Tools::log()->error('Error: Falló move_uploaded_file. Revise permisos.');
+        // Crear carpeta Private/Certificados si no existe
+        $certDir = FS_FOLDER . DIRECTORY_SEPARATOR . 'Private' . DIRECTORY_SEPARATOR . 'Certificados' . DIRECTORY_SEPARATOR;
+        if (!is_dir($certDir) && !mkdir($certDir, 0755, true)) {
+            Tools::log()->error('No se pudo crear la carpeta Private/Certificados');
             return true;
         }
 
-        // Aseguramos que estamos sobre el ID 1
-        $model = $this->getModel();
-        $model->id = 1;
-        $model->ruta_certificado_p12 = self::CERT_DIR . $filename;
-        
-        // Solo actualizamos el password si se proporcionó uno nuevo en el modal
-        if ($this->request->request->get('password_certificado_modal') !== '') {
-            $model->password_certificado = $password;
+        // Generar nombre seguro con timestamp
+        $filename = 'cert_' . date('Ymd_His') . '.p12';
+        $destPath = $certDir . $filename;
+
+        if (false === move_uploaded_file($uploadFile->getPathname(), $destPath)) {
+            Tools::log()->error('Error al guardar el archivo');
+            return true;
         }
-        
-        $model->cert_sujeto      = $certInfo['sujeto'];
-        $model->cert_emisor      = $certInfo['emisor'];
+
+        // Actualizar configuración
+        $model->id = 1;
+        $model->ruta_certificado_p12 = 'Private/Certificados/' . $filename;
+        $model->cert_sujeto = $certInfo['sujeto'];
+        $model->cert_emisor = $certInfo['emisor'];
         $model->cert_vencimiento = $certInfo['vencimiento'];
 
         if ($model->save()) {
@@ -203,9 +196,12 @@ class EditECFConfiguracion extends EditController
      */
     protected function readCertificateInfo(string $p12Path, string $password = ''): array|false
     {
-        $fullPath = $this->getCertFullPath($p12Path);
+        // Si el archivo existe directamente (ej. temporal de subida), lo usamos.
+        // Si no, intentamos resolver la ruta completa.
+        $fullPath = file_exists($p12Path) ? $p12Path : $this->getCertFullPath($p12Path);
+        
         if (empty($fullPath) || !file_exists($fullPath)) {
-            $this->lastOpenSSLError = 'Archivo no encontrado: ' . $fullPath;
+            $this->lastOpenSSLError = 'Archivo no encontrado: ' . $p12Path;
             return false;
         }
 
@@ -222,7 +218,7 @@ class EditECFConfiguracion extends EditController
             }
         }
 
-        $this->lastOpenSSLError = 'Contraseña incorrecta o certificado no válido. ' . substr((string)$output, 0, 500);
+        $this->lastOpenSSLError = 'Contraseña incorrecta o certificado no válido. ' . substr((string)$output, 0, 200);
         return false;
     }
 
@@ -356,21 +352,33 @@ class EditECFConfiguracion extends EditController
      */
     protected function getCertFullPath(string $relativeOrAbsolute): string
     {
-        if (empty($relativeOrAbsolute)) { return ''; }
-
-        if (strpos($relativeOrAbsolute, ':') !== false || strpos($relativeOrAbsolute, '/') === 0) {
-            if (file_exists($relativeOrAbsolute)) { return $relativeOrAbsolute; }
-            $relativeOrAbsolute = self::CERT_DIR . basename($relativeOrAbsolute);
+        if (empty($relativeOrAbsolute)) {
+            return '';
         }
 
-        $path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relativeOrAbsolute);
-        $fullPath = FS_FOLDER . DIRECTORY_SEPARATOR . $path;
-        
-        if (!file_exists($fullPath)) {
-            $fallback = FS_FOLDER . DIRECTORY_SEPARATOR . 'Plugins' . DIRECTORY_SEPARATOR . 'eCF_GMV' . DIRECTORY_SEPARATOR . 'Certificados' . DIRECTORY_SEPARATOR . basename($relativeOrAbsolute);
-            if (file_exists($fallback)) { return $fallback; }
+        // Si es ruta absoluta y existe, usarla
+        if (file_exists($relativeOrAbsolute)) {
+            return $relativeOrAbsolute;
         }
-        
-        return $fullPath;
+
+        // Buscar en Private/Certificados/ (Nueva ubicación segura)
+        $privatePath = FS_FOLDER . DIRECTORY_SEPARATOR . 'Private' . DIRECTORY_SEPARATOR . 'Certificados' . DIRECTORY_SEPARATOR . basename($relativeOrAbsolute);
+        if (file_exists($privatePath)) {
+            return $privatePath;
+        }
+
+        // Buscar en la ruta relativa original (Fallback)
+        $fullPath = FS_FOLDER . DIRECTORY_SEPARATOR . $relativeOrAbsolute;
+        if (file_exists($fullPath)) {
+            return $fullPath;
+        }
+
+        // Buscar en la carpeta del plugin (Legacy)
+        $legacyPath = FS_FOLDER . DIRECTORY_SEPARATOR . 'Plugins' . DIRECTORY_SEPARATOR . 'eCF_GMV' . DIRECTORY_SEPARATOR . 'Certificados' . DIRECTORY_SEPARATOR . basename($relativeOrAbsolute);
+        if (file_exists($legacyPath)) {
+            return $legacyPath;
+        }
+
+        return '';
     }
 }

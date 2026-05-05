@@ -50,6 +50,9 @@
             <column name="cert-file" title="Seleccionar archivo .p12" numcolumns="12">
                 <widget type="file" fieldname="cert_file" accept=".p12" required="true"/>
             </column>
+            <column name="info-upload" numcolumns="12">
+                <alert color="info">Tamaño máximo: 99 MB. El sistema usará la contraseña guardada en la configuración para validar el archivo.</alert>
+            </column>
         </group>
         <group name="verify-cert" title="Verificar Contraseña del Certificado" icon="fas fa-key">
             <column name="verify-password" title="Contraseña del certificado .p12" numcolumns="12">
