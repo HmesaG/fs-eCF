@@ -82,12 +82,12 @@ class ListAprobacionComercial extends ListController
         }
     }
 
-    protected function loadData($viewName, $view = null)
+    protected function loadData($viewName, $view)
     {
         // Forzamos el filtro para solo ver recepciones B2B
-        if ($viewName === 'ListAprobacionComercial') {
+        if ($viewName === 'ListAprobacionComercial' && isset($this->views[$viewName])) {
             $this->views[$viewName]->where[] = new \FacturaScripts\Core\Base\DataBase\DataBaseWhere('tipo', 'RECEPCION_B2B');
         }
-        parent::loadData($viewName);
+        parent::loadData($viewName, $view);
     }
 }
