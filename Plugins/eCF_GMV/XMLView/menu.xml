@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menu>
+    <item>
+        <name>administration</name>
+        <item>
+            <name>ecf_gmv</name>
+            <label>e-CF</label>
+            <icon>fas fa-file-invoice-dollar</icon>
+            <order>100</order>
+            <item>
+                <name>ecf_configuracion</name>
+                <label>Configuración</label>
+                <controller>ListECFConfiguracion</controller>
+            </item>
+            <item>
+                <name>ecf_log</name>
+                <label>Envíos</label>
+                <controller>ListECFLog</controller>
+            </item>
+            <item>
+                <name>ecf_tracking_pendiente</name>
+                <label>Pendientes</label>
+                <controller>ListECFTrackingPendiente</controller>
+            </item>
+            <item>
+                <name>aprobacion_comercial</name>
+                <label>Aprobación Comercial</label>
+                <controller>ListAprobacionComercial</controller>
+            </item>
+            <item>
+                <name>resumen_consumo</name>
+                <label>Resumen RFCE</label>
+                <controller>ListResumenConsumo</controller>
+            </item>
+        </item>
+    </item>
+</menu>
