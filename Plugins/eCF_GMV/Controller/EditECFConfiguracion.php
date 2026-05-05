@@ -56,6 +56,30 @@ class EditECFConfiguracion extends EditController
         return 'ECFConfiguracion';
     }
 
+    protected function loadModelData(): void
+    {
+        // Forzar que siempre cargue el registro con ID 1
+        $code = $this->request->query->get('code', '1');
+
+        if (empty($code) || $code === 'null') {
+            $code = '1';
+            $this->request->query->set('code', '1');
+        }
+
+        parent::loadModelData();
+
+        $model = $this->getModel();
+        if (null === $model || false === $model->exists()) {
+            $newModel = new \FacturaScripts\Plugins\eCF_GMV\Model\ECFConfiguracion();
+            $newModel->id = 1;
+            $newModel->ambiente = 'TesteCF';
+            $newModel->activo = false;
+            $newModel->save();
+
+            parent::loadModelData();
+        }
+    }
+
     protected function createViews()
     {
         $this->addEditView('EditECFConfiguracion', 'ECFConfiguracion', 'Configuración e-CF', 'fas fa-cog');
