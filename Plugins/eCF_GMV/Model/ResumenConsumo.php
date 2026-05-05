@@ -13,8 +13,9 @@ use FacturaScripts\Core\Template\ModelTrait;
  * Los datos reales los inyecta el servicio DgiiResumenServicio::getPendientes()
  * directamente en $this->views[$viewName]->data dentro de loadData().
  *
- * El tableName vacío previene que FacturaScripts intente crear o migrar
- * una tabla en la base de datos para este modelo.
+ * El tableName 'tmp_resumen_consumo' permite que FacturaScripts maneje el
+ * modelo correctamente en la versión 2025, aunque los datos se sigan
+ * inyectando manualmente desde el servicio.
  */
 class ResumenConsumo extends ModelClass
 {

@@ -34,7 +34,7 @@ class ListResumenConsumo extends ListController
      * En este controlador no listamos una tabla directamente desde la DB,
      * sino que usamos el servicio para obtener los días pendientes.
      */
-    protected function loadData($viewName, $view = null)
+    protected function loadData($viewName, $view)
     {
         switch ($viewName) {
             case 'ListResumenConsumo':
