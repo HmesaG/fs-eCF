@@ -85,7 +85,10 @@ class EditECFConfiguracion extends EditController
     protected function createViews()
     {
         $this->addEditView('EditECFConfiguracion', 'ECFConfiguracion', 'Configuración e-CF', 'fas fa-cog');
-        
+
+        // FORZAR QUE LA VISTA SE CREE CON EL ID 1
+        $this->setSettings('EditECFConfiguracion', 'code', '1');
+
         // Desactivar botones de Nuevo y Eliminar para forzar configuración única
         $this->setSettings('EditECFConfiguracion', 'btnNew', false);
         $this->setSettings('EditECFConfiguracion', 'btnDelete', false);
