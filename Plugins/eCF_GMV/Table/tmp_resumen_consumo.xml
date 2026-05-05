@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table>
+    <column>
+        <name>fecha</name>
+        <type>date</type>
+        <primarykey>true</primarykey>
+    </column>
+    <column>
+        <name>total</name>
+        <type>double</type>
+        <default>0</default>
+    </column>
+    <column>
+        <name>cantidad</name>
+        <type>integer</type>
+        <default>0</default>
+    </column>
+    <column>
+        <name>estado</name>
+        <type>character varying(20)</type>
+    </column>
+    <column>
+        <name>mensaje</name>
+        <type>text</type>
+    </column>
+</table>

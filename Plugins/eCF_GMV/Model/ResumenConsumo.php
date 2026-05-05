@@ -42,8 +42,7 @@ class ResumenConsumo extends ModelClass
 
     public static function tableName(): string
     {
-        // Sin tabla: los datos son transitorios, provistos por DgiiResumenServicio
-        return '';
+        return 'tmp_resumen_consumo';
     }
 
     public function install(): string
