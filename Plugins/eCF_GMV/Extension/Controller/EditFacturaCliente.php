@@ -36,14 +36,16 @@ class EditFacturaCliente
 
     public function execPreviousAction(): Closure
     {
-        return function (string $action) {
+        return function (string $action): bool {
             /** @var \FacturaScripts\Core\Lib\ExtendedController\EditController $this */
             if ($action === 'imprimir-ecf') {
                 $idfactura = $this->request->get('code', '');
                 if (!empty($idfactura)) {
                     $this->redirect('ImprimirECF?idfactura=' . $idfactura);
                 }
+                return false; // Detener ejecución del kernel tras interceptar la acción
             }
+            return true; // Permitir flujo normal para otras acciones
         };
     }
 

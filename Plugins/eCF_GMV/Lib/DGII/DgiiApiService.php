@@ -51,44 +51,53 @@ class DgiiApiService
     }
 
     /**
-     * Obtiene (o refresca) el Token JWT de DGII. Se cachea 55 minutos.
+     * Obtiene (o refresca) el Token JWT de DGII usando el flujo de Semilla.
+     * Se cachea 55 minutos.
      */
     public function obtenerToken(): string
     {
-        $cacheKey = 'dgii_token_' . md5($this->config->ruta_certificado_p12);
+        $cacheKey = 'dgii_token_' . md5($this->config->ruta_certificado_p12 . $this->config->ambiente);
 
         $tokenGuardado = Cache::get($cacheKey);
         if (!empty($tokenGuardado)) {
             return $tokenGuardado;
         }
 
-        // Extraer certificado del .p12
-        $p12data = file_get_contents($this->config->ruta_certificado_p12);
-        $certs   = [];
-        if (!openssl_pkcs12_read($p12data, $certs, $this->config->password_certificado)) {
-            throw new \RuntimeException('eCF-GMV: No se pudo leer el certificado .p12. Verifique la contraseña.');
+        // 1. Obtener Semilla
+        $urlSemilla = str_replace('/recepcion', '/autenticacion', $this->urlBase) . '/api/Autenticacion/Semilla';
+        $respSemilla = $this->httpGet($urlSemilla, []);
+        if ($respSemilla['code'] !== 200) {
+            throw new \RuntimeException('eCF-GMV: Error obteniendo semilla de DGII (HTTP ' . $respSemilla['code'] . ')');
         }
 
-        $url      = $this->urlBase . '/api/Autenticacion/tokens';
-        $response = $this->httpPost($url, '', [
-            'Content-Type: application/json',
-            'Authorization: ' . $this->buildCertHeader($certs),
+        // 2. Firmar Semilla
+        // El XML de la semilla debe firmarse tal cual se recibe.
+        $xmlSemillaFirmada = DgiiXmlFirmador::firmarECF(
+            $respSemilla['body'],
+            $this->config->ruta_certificado_p12,
+            $this->config->password_certificado
+        );
+
+        // 3. Validar Semilla y obtener Token
+        $urlValidar = str_replace('/recepcion', '/autenticacion', $this->urlBase) . '/api/Autenticacion/ValidarSemilla';
+        $respToken = $this->httpPost($urlValidar, $xmlSemillaFirmada, [
+            'Content-Type: application/xml'
         ]);
 
-        $data = json_decode($response['body'], true);
-        if (empty($data['access_token'])) {
-            $this->registrarLog('AUTH_TOKEN', '', '', $response['body'], $response['code']);
-            throw new \RuntimeException('eCF-GMV: DGII no devolvió token. Respuesta: ' . $response['body']);
+        $data = json_decode($respToken['body'], true);
+        if (empty($data['token'])) {
+            $this->registrarLog('AUTH_TOKEN_ERROR', '', $xmlSemillaFirmada, $respToken['body'], $respToken['code']);
+            throw new \RuntimeException('eCF-GMV: DGII no devolvió token. Respuesta: ' . $respToken['body']);
         }
 
-        Cache::set($cacheKey, $data['access_token'], 3300); // 55 min
-        return $data['access_token'];
+        Cache::set($cacheKey, $data['token'], 3300); // 55 min
+        return $data['token'];
     }
 
     /**
      * Envía un e-CF firmado a DGII.
      */
-    public function enviarECF(string $xmlFirmado, string $referencia): array
+    public function enviarECF(string $xmlFirmado, string $referencia, string $xmlSinFirma = ''): array
     {
         $token    = $this->obtenerToken();
         $url      = $this->urlBase . '/api/ECF';
@@ -97,11 +106,13 @@ class DgiiApiService
             'Authorization: Bearer ' . $token,
         ]);
 
-        $this->registrarLog('ENVIO_ECF', $referencia, $xmlFirmado, $response['body'], $response['code']);
-
         $data = json_decode($response['body'], true);
+        $trackId = $data['trackId'] ?? '';
+
+        $this->registrarLog('ENVIO_ECF', $referencia, $xmlFirmado, $response['body'], $response['code'], $xmlSinFirma, $xmlFirmado);
+
         return [
-            'trackid' => $data['trackId'] ?? '',
+            'trackid' => $trackId,
             'estado'  => $data['estado']  ?? self::ESTADO_EN_PROCESO,
             'mensaje' => $data['mensaje'] ?? $response['body'],
         ];
@@ -113,7 +124,10 @@ class DgiiApiService
     public function consultarEstado(string $rncEmisor, string $encf, string $trackid): array
     {
         $token = $this->obtenerToken();
-        $url   = $this->urlBase . '/api/ECF/' . urlencode($rncEmisor) . '/' . urlencode($encf) . '/' . urlencode($trackid);
+        $url   = str_replace('/recepcion', '/consultaresultado', $this->urlBase) 
+            . '/api/Consultas/Estado?rncEmisor=' . urlencode($rncEmisor) 
+            . '&encf=' . urlencode($encf) 
+            . '&trackId=' . urlencode($trackid);
 
         $response = $this->httpGet($url, [
             'Authorization: Bearer ' . $token,
@@ -122,16 +136,19 @@ class DgiiApiService
         $this->registrarLog('CONSULTA_ESTADO', $encf, '', $response['body'], $response['code']);
 
         $data = json_decode($response['body'], true);
+        
+        // La respuesta puede ser un array de objetos o un objeto único según la versión
+        // Usualmente es: {"estado": 1, "mensaje": "Aceptado", ...}
         return [
             'estado'  => $data['estado']  ?? self::ESTADO_NO_ENCONTRADO,
-            'mensaje' => $data['mensaje'] ?? $response['body'],
+            'mensaje' => $data['mensaje'] ?? ($data['mensajes'][0]['valor'] ?? $response['body']),
         ];
     }
 
     /**
      * Envía un e-CF consumidor por RFCE (e-CF tipo 32 < 250,000 DOP).
      */
-    public function enviarRFCE(string $xmlFirmado, string $referencia): array
+    public function enviarRFCE(string $xmlFirmado, string $referencia, string $xmlSinFirma = ''): array
     {
         $token = $this->obtenerToken();
         $url   = ($this->config->ambiente === 'eCF')
@@ -143,7 +160,7 @@ class DgiiApiService
             'Authorization: Bearer ' . $token,
         ]);
 
-        $this->registrarLog('ENVIO_RFCE', $referencia, $xmlFirmado, $response['body'], $response['code']);
+        $this->registrarLog('ENVIO_RFCE', $referencia, $xmlFirmado, $response['body'], $response['code'], $xmlSinFirma, $xmlFirmado);
 
         $data = json_decode($response['body'], true);
         return [
@@ -151,6 +168,47 @@ class DgiiApiService
             'estado'  => $data['estado'] ?? self::ESTADO_RECHAZADO,
             'mensaje' => $data['mensaje'] ?? $response['body'],
         ];
+    }
+    /**
+     * Envía una Aprobación Comercial (ACECF) al endpoint del emisor (B2B).
+     */
+    public function enviarACECF(string $urlDestino, string $xmlFirmado, string $referencia, string $xmlSinFirma = ''): array
+    {
+        $response = $this->httpPost($urlDestino, $xmlFirmado, [
+            'Content-Type: application/xml'
+        ]);
+
+        $this->registrarLog('ENVIO_ACECF', $referencia, $xmlFirmado, $response['body'], $response['code'], $xmlSinFirma, $xmlFirmado);
+
+        return [
+            'estado'  => ($response['code'] === 200 || $response['code'] === 201) ? 1 : 0,
+            'mensaje' => $response['body'],
+        ];
+    }
+
+    /**
+     * Consulta el directorio de la DGII para obtener el endpoint de recepción de un RNC.
+     */
+    public function consultarDirectorio(string $rnc): ?string
+    {
+        try {
+            $token = $this->obtenerToken();
+            $url = str_replace('/recepcion', '/consultadirectorio', $this->urlBase) . '/api/Consultas/Directorio?rnc=' . urlencode($rnc);
+            
+            $response = $this->httpGet($url, [
+                'Authorization: Bearer ' . $token,
+            ]);
+
+            if ($response['code'] !== 200) {
+                return null;
+            }
+
+            $data = json_decode($response['body'], true);
+            // El formato suele ser un objeto con la URL de recepción
+            return $data['urlRecepcion'] ?? null;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     // -----------------------------------------------------------------------
@@ -201,6 +259,11 @@ class DgiiApiService
         return ['body' => $respBody, 'code' => $httpCode];
     }
 
+    /**
+     * @deprecated No utilizado actualmente. Reservado para una posible implementación futura
+     *             de autenticación directa por certificado (sin flujo JWT/Semilla).
+     *             Eliminar si no se implementa en la próxima versión mayor.
+     */
     private function buildCertHeader(array $certs): string
     {
         // Extraer el certificado público en base64 para cabecera de autenticación
@@ -208,15 +271,17 @@ class DgiiApiService
         return 'cert ' . trim($certClean);
     }
 
-    private function registrarLog(string $tipo, string $referencia, string $peticion, string $respuesta, int $httpCode): void
+    private function registrarLog(string $tipo, string $referencia, string $peticion, string $respuesta, int $httpCode, string $xmlSinFirma = '', string $xmlFirmado = ''): void
     {
         $log = new ECFLog();
-        $log->tipo       = $tipo;
-        $log->referencia = $referencia;
-        $log->peticion   = substr($peticion, 0, 65535);
-        $log->respuesta  = substr($respuesta, 0, 65535);
-        $log->http_code  = $httpCode;
-        $log->fecha      = date('Y-m-d H:i:s');
+        $log->tipo          = $tipo;
+        $log->referencia    = $referencia;
+        $log->peticion      = substr($peticion, 0, 65535);
+        $log->respuesta     = substr($respuesta, 0, 65535);
+        $log->http_code     = $httpCode;
+        $log->xml_sin_firma = $xmlSinFirma;
+        $log->xml_firmado   = $xmlFirmado;
+        $log->fecha         = date('Y-m-d H:i:s');
         $log->save();
     }
 }

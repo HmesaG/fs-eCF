@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <column name="fecha" order="100" width="160">
+            <widget type="datetime" fieldname="fecha" title="Fecha Recibo"/>
+        </column>
+        <column name="referencia" order="110">
+            <widget type="text" fieldname="referencia" title="Emisor | eNCF"/>
+        </column>
+        <column name="http_code" order="120" title="HTTP">
+            <widget type="number" fieldname="http_code"/>
+        </column>
+        <column name="respuesta" order="130" title="Respuesta">
+            <widget type="text" fieldname="respuesta"/>
+        </column>
+    </columns>
+    <actions>
+        <action name="aprobar" label="Aprobar (ACECF)" icon="fas fa-check-double" color="success">
+            <tooltip>Generar y enviar XML de Aprobación Comercial (B2B)</tooltip>
+        </action>
+        <action name="ver" label="Ver Detalles" icon="fas fa-eye" color="info" link="EditECFLog?id=" field="id"/>
+    </actions>
+    <rows>
+        <row type="status">
+            <option color="success" fieldname="http_code" title="Procesado">200</option>
+            <option color="info" fieldname="http_code" title="Pendiente">0</option>
+        </row>
+    </rows>
+</view>

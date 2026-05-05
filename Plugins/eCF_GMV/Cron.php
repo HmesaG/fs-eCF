@@ -11,6 +11,7 @@ use FacturaScripts\Core\Tools;
 use FacturaScripts\Dinamic\Model\FacturaCliente;
 use FacturaScripts\Dinamic\Model\FacturaProveedor;
 use FacturaScripts\Plugins\eCF_GMV\Lib\DGII\DgiiApiService;
+use FacturaScripts\Plugins\eCF_GMV\Lib\DGII\DgiiResumenServicio;
 use FacturaScripts\Plugins\eCF_GMV\Model\ECFConfiguracion;
 use FacturaScripts\Plugins\eCF_GMV\Model\ECFTrackingPendiente;
 
@@ -27,6 +28,20 @@ class Cron extends CronClass
             $this->consultarPendientes($config);
             $this->jobDone('ecf-gmv-consulta-pendientes');
         }
+
+        // Procesar RFCE diariamente a las 23:50
+        if ($this->isTimeForJob('ecf-gmv-rfce-diario', '1 day')) {
+            // Solo procesamos si es cerca de medianoche o al inicio del día siguiente
+            $this->procesarRFCE();
+            $this->jobDone('ecf-gmv-rfce-diario');
+        }
+    }
+
+    private function procesarRFCE(): void
+    {
+        $ayer = new \DateTime();
+        $ayer->modify('-1 day');
+        DgiiResumenServicio::procesarDia($ayer);
     }
 
     private function consultarPendientes(ECFConfiguracion $config): void

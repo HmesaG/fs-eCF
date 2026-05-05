@@ -14,6 +14,7 @@ namespace FacturaScripts\Plugins\eCF_GMV;
 use FacturaScripts\Core\Template\InitClass;
 use FacturaScripts\Core\Tools;
 use FacturaScripts\Plugins\eCF_GMV\Model\ECFConfiguracion;
+use FacturaScripts\Plugins\eCF_GMV\Model\ECFLog;
 
 class Init extends InitClass
 {
@@ -21,17 +22,24 @@ class Init extends InitClass
     {
         // Extender el controlador de factura de cliente
         $this->loadExtension(new Extension\Controller\EditFacturaCliente());
+        
+        // Extender el modelo cliente y factura
+        $this->loadExtension(new Extension\Model\Cliente());
+        $this->loadExtension(new Extension\Model\FacturaCliente());
     }
 
     public function update(): void
     {
         // Limpieza de duplicados (solo permitimos un registro con ID 1)
         $db = new \FacturaScripts\Core\Base\DataBase();
-        $db->exec("DELETE FROM ecf_configuracion WHERE id > 1");
+        $model = new ECFConfiguracion();
+        $db->exec("DELETE FROM " . $model->tableName() . " WHERE id > 1");
 
         // Crear configuración por defecto si no existe
         $this->crearConfiguracionInicial();
     }
+
+
 
     private function crearConfiguracionInicial(): void
     {
@@ -44,7 +52,7 @@ class Init extends InitClass
             $nueva->url_base_testecf    = 'https://ecf.dgii.gov.do/TesteCF';
             $nueva->url_base_ecf        = 'https://ecf.dgii.gov.do/eCF';
             $nueva->url_rfce_test       = 'https://ecf.dgii.gov.do/TesteCF/api/FacturasConsumidor';
-            $nueva->url_rfce_prod       = 'https://fc.dgii.gov.do/TesteCF/api/FacturasConsumidor';
+            $nueva->url_rfce_prod       = 'https://fc.dgii.gov.do/api/FacturasConsumidor';
             $nueva->ruta_certificado_p12 = '';
             $nueva->password_certificado = '';
             $nueva->timeout_segundos    = 30;

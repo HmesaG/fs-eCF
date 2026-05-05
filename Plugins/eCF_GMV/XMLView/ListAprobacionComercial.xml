@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <column>
+            <title>Fecha</title>
+            <field>fecha</field>
+            <type>datetime</type>
+            <width>150</width>
+        </column>
+        <column>
+            <title>Emisor | eNCF</title>
+            <field>referencia</field>
+            <type>string</type>
+        </column>
+        <column>
+            <title>Factura Compra</title>
+            <field>idfacturaproveedor</field>
+            <type>string</type>
+            <link>EditFacturaProveedor</link>
+        </column>
+        <column>
+            <title>Estado API</title>
+            <field>respuesta</field>
+            <type>string</type>
+        </column>
+    </columns>
+</view>

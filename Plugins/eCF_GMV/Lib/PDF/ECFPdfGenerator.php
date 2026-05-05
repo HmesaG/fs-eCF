@@ -64,7 +64,7 @@ class ECFPdfGenerator
 
         // Inicializar Cezpdf (librería del Core)
         $this->pdf = new Cezpdf('a4', 'portrait');
-        $this->pdf->addInfo('Title',   'e-CF ' . $factura->codigo);
+        $this->pdf->addInfo('Title',   'e-CF ' . $factura->numeroncf);
         $this->pdf->addInfo('Author',  $this->empresa->nombre);
         $this->pdf->addInfo('Subject', 'Comprobante Fiscal Electrónico');
 
@@ -151,7 +151,7 @@ class ECFPdfGenerator
         $this->pdf->addText($x + 8, $this->y - 18, 12, $tipoLabel, $w / 2 - 10, 'left');
 
         // NCF / número e-CF
-        $ncf = $this->factura->codigo ?? '';
+        $ncf = $this->factura->numeroncf ?? '';
         $this->pdf->setColor(...array_map(fn($c) => $c / 255, self::COLOR_SECONDARY));
         $this->pdf->setFontSize(11);
         $this->pdf->addText($x + $w / 2, $this->y - 18, 11, 'No. ' . $ncf, $w / 2, 'right');
@@ -461,7 +461,7 @@ class ECFPdfGenerator
     private function getTipoLabel(): string
     {
         // Tipos DGII: 31=Fiscal, 32=Consumidor Final, 33=ND, 34=NC, 41=Gastos Menor
-        $tipo = substr($this->factura->codigo ?? '', 1, 2);
+        $tipo = substr($this->factura->numeroncf ?? '', 1, 2);
         $tipos = [
             '31' => 'FACTURA DE CRÉDITO FISCAL ELECTRÓNICA',
             '32' => 'FACTURA DE CONSUMO ELECTRÓNICA',
@@ -481,7 +481,7 @@ class ECFPdfGenerator
     {
         // Contenido estándar QR DGII: RNC emisor + NCF + total + fecha
         $rnc     = $this->empresa->cifnif ?? '';
-        $ncf     = $this->factura->codigo ?? '';
+        $ncf     = $this->factura->numeroncf ?? '';
         $total   = number_format((float)($this->factura->total ?? 0), 2, '.', '');
         $fecha   = date('Ymd', strtotime($this->factura->fecha ?? 'now'));
         $rncComp = $this->factura->cifnif ?? '00000000000';
@@ -519,8 +519,8 @@ class ECFPdfGenerator
         }
 
         return [
-            ['NCF:',              $this->factura->codigo ?? ''],
-            ['Tipo eCF:',         substr($this->factura->codigo ?? '', 1, 2)],
+            ['NCF:',              $this->factura->numeroncf ?? ''],
+            ['Tipo eCF:',         substr($this->factura->numeroncf ?? '', 1, 2)],
             ['RNC Emisor:',       $this->empresa->cifnif ?? ''],
             ['RNC Comprador:',    $this->factura->cifnif ?? 'Consumidor Final'],
             ['Cód. Seguridad:',   $codigoSeguridad],

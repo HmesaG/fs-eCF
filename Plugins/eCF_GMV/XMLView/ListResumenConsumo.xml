@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <column>
+            <title>Fecha</title>
+            <name>fecha</name>
+            <type>date</type>
+        </column>
+        <column>
+            <title>Facturas E32</title>
+            <name>cantidad</name>
+            <type>number</type>
+        </column>
+        <column>
+            <title>Monto Total</title>
+            <name>total</name>
+            <type>money</type>
+        </column>
+    </columns>
+</view>

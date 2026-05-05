@@ -28,7 +28,7 @@ class ImprimirECF extends Controller
         return $data;
     }
 
-    public function privateCore(&$response, $user, $permissions): void
+    public function privateCore(&$response, $user, $permissions)
     {
         parent::privateCore($response, $user, $permissions);
 
@@ -47,7 +47,7 @@ class ImprimirECF extends Controller
         }
 
         // Verificar que tiene NCF (código e-CF)
-        if (empty($factura->codigo)) {
+        if (empty($factura->numeroncf)) {
             \FacturaScripts\Core\Tools::log()->warning('Esta factura no tiene NCF asignado.');
             $this->redirect('EditFacturaCliente?code=' . $idfactura);
             return;
@@ -57,7 +57,7 @@ class ImprimirECF extends Controller
             $generator = new ECFPdfGenerator($factura);
             $pdfContent = $generator->generate();
 
-            $filename = 'eCF_' . $factura->codigo . '_' . date('Ymd') . '.pdf';
+            $filename = 'eCF_' . $factura->numeroncf . '_' . date('Ymd') . '.pdf';
 
             $response->headers->set('Content-Type', 'application/pdf');
             $response->headers->set('Content-Disposition', 'inline; filename="' . $filename . '"');

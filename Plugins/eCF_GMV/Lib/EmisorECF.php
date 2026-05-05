@@ -53,9 +53,14 @@ class EmisorECF
             return $this->error('El tipo de comprobante ' . $factura->tipocomprobante . ' no es electrónico (e-CF).');
         }
 
+        // Enrutar según tipo (una sola evaluación con cast explícito a float)
+        $esRFCE = ($factura->tipocomprobante === '32' && (float)$factura->total < self::UMBRAL_RFCE);
+
         // Generar XML
         $datos        = $this->construirDatosXml($factura);
-        $xmlSinFirmar = DgiiXmlGenerador::generarECF($datos);
+        $xmlSinFirmar = $esRFCE
+            ? DgiiXmlGenerador::generarRFCE($datos)
+            : DgiiXmlGenerador::generarECF($datos);
 
         // Firmar XML
         $xmlFirmado = DgiiXmlFirmador::firmarECF(
@@ -67,18 +72,17 @@ class EmisorECF
         $factura->ecf_xml_firmado = $xmlFirmado;
         $factura->ecf_fecha_firma = date('Y-m-d H:i:s');
 
-        // Enrutar según tipo
-        $esRFCE = ($factura->tipocomprobante === '32' && $factura->total < self::UMBRAL_RFCE);
+        // Enviar por la misma ruta determinada al generar el XML
         return $esRFCE
-            ? $this->enviarRFCE($factura, $xmlFirmado)
-            : $this->enviarNormal($factura, $xmlFirmado);
+            ? $this->enviarRFCE($factura, $xmlFirmado, $xmlSinFirmar)
+            : $this->enviarNormal($factura, $xmlFirmado, $xmlSinFirmar);
     }
 
-    private function enviarNormal(FacturaCliente $factura, string $xmlFirmado): array
+    private function enviarNormal(FacturaCliente $factura, string $xmlFirmado, string $xmlSinFirma = ''): array
     {
-        $resultado = $this->api->enviarECF($xmlFirmado, $factura->numero2 ?? $factura->codigo);
+        $resultado = $this->api->enviarECF($xmlFirmado, $factura->numero2 ?? $factura->codigo, $xmlSinFirma);
 
-        $factura->ecf_trackid     = $resultado['trackid'];
+        $factura->ecf_trackid = $resultado['trackid'];
         $factura->ecf_estado_dgii = $resultado['estado'];
         $factura->save();
 
@@ -95,9 +99,9 @@ class EmisorECF
         ];
     }
 
-    private function enviarRFCE(FacturaCliente $factura, string $xmlFirmado): array
+    private function enviarRFCE(FacturaCliente $factura, string $xmlFirmado, string $xmlSinFirma = ''): array
     {
-        $resultado = $this->api->enviarRFCE($xmlFirmado, $factura->numero2 ?? $factura->codigo);
+        $resultado = $this->api->enviarRFCE($xmlFirmado, $factura->numero2 ?? $factura->codigo, $xmlSinFirma);
 
         if (!empty($resultado['encf'])) {
             $factura->numeroncf = $resultado['encf'];

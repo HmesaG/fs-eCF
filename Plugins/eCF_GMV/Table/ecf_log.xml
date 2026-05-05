@@ -31,8 +31,23 @@
         <null>YES</null>
     </column>
     <column>
+        <name>xml_sin_firma</name>
+        <type>text</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>xml_firmado</name>
+        <type>text</type>
+        <null>YES</null>
+    </column>
+    <column>
         <name>fecha</name>
         <type>timestamp without time zone</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>idfacturaproveedor</name>
+        <type>integer</type>
         <null>YES</null>
     </column>
     <constraint>

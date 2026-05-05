@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="ecf_data" title="Datos e-CF" icon="fas fa-file-invoice">
+            <column name="url_recepcion_ecf" numcolumns="12">
+                <widget type="text" fieldname="url_recepcion_ecf" title="URL Recepción e-CF (B2B)"/>
+            </column>
+        </group>
+    </columns>
+</view>

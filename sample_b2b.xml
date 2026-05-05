@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eCF>
+    <Encabezado>
+        <Version>1.0</Version>
+        <IdDoc>
+            <TipoeCF>31</TipoeCF>
+            <eNCF>E310000000001</eNCF>
+            <FechaVencimientoSecuencia>31-12-2026</FechaVencimientoSecuencia>
+            <IndicadorMontoGravado>1</IndicadorMontoGravado>
+            <TipoIngreso>01</TipoIngreso>
+        </IdDoc>
+        <Emisor>
+            <RNCEmisor>130862346</RNCEmisor>
+            <RazonSocialEmisor>Empresa Emisora de Prueba SRL</RazonSocialEmisor>
+            <NombreComercial>Emisor Prueba</NombreComercial>
+            <DireccionEmisor>Av. Winston Churchill</DireccionEmisor>
+            <FechaEmision>04-05-2026</FechaEmision>
+        </Emisor>
+        <Comprador>
+            <RNCComprador>123456789</RNCComprador>
+            <RazonSocialComprador>Empresa GMV</RazonSocialComprador>
+        </Comprador>
+        <Totales>
+            <MontoTotal>1180.00</MontoTotal>
+            <MontoTotalItbis>180.00</MontoTotalItbis>
+        </Totales>
+    </Encabezado>
+    <Detalles>
+        <Item>
+            <NumeroLinea>1</NumeroLinea>
+            <NombreItem>Servicio de Prueba B2B</NombreItem>
+            <IndicadorFacturacion>1</IndicadorFacturacion>
+            <CantidadItem>1.00</CantidadItem>
+            <PrecioUnitarioItem>1000.00</PrecioUnitarioItem>
+            <DescuentoMonto>0.00</DescuentoMonto>
+            <MontoItem>1000.00</MontoItem>
+        </Item>
+    </Detalles>
+</eCF>

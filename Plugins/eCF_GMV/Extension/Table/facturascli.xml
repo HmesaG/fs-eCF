@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Extension de la tabla 'facturascli' para el plugin eCF_GMV.
+
+    Las columnas ecf_trackid, ecf_estado_dgii, ecf_fecha_firma y ecf_xml_firmado
+    ya son aportadas por el plugin base fsRepublicaDominicana (declarado como
+    dependencia en facturascripts.ini). NO se redeclaran aquí para evitar
+    colisiones de tipos en el esquema.
+
+    Este archivo solo añade la columna exclusiva de eCF_GMV.
+-->
+<table>
+    <column>
+        <!-- Código de seguridad del e-CF: últimos 6 caracteres del hash del XML firmado -->
+        <name>ecf_codigo_seguridad</name>
+        <type>character varying(10)</type>
+        <null>YES</null>
+    </column>
+</table>

@@ -27,7 +27,7 @@ class EditECFConfiguracion extends EditController
         return $pageData;
     }
 
-    public function privateCore(&$response, $user, $permissions): void
+    public function privateCore(&$response, $user, $permissions)
     {
         $currentCode = $this->request->query->get('code') ?? $this->request->request->get('code');
         
@@ -44,7 +44,7 @@ class EditECFConfiguracion extends EditController
             }
             
             // Redirigir siempre a code=1
-            $this->redirect(Tools::url('EditECFConfiguracion', ['code' => 1]));
+            $this->redirect('EditECFConfiguracion?code=1');
             return;
         }
 
@@ -110,6 +110,8 @@ class EditECFConfiguracion extends EditController
                 return $this->uploadCertificateAction();
             case 'test-cert':
                 return $this->testCertificateAction();
+            case 'test-conexion':
+                return $this->testConexionAction();
         }
 
         return parent::execPreviousAction($action);
@@ -185,7 +187,7 @@ class EditECFConfiguracion extends EditController
 
         if ($model->save()) {
             Tools::log()->notice('Certificado subido y validado con éxito.');
-            $this->redirect($this->url() . '?code=1');
+            $this->redirect('EditECFConfiguracion?code=1');
             return false;
         }
 
@@ -310,11 +312,28 @@ class EditECFConfiguracion extends EditController
             $model->cert_emisor      = $certInfo['emisor'];
             $model->cert_vencimiento = $certInfo['vencimiento'];
             $model->save();
-            $this->redirect($this->url() . '?code=' . $model->id);
+            $this->redirect('EditECFConfiguracion?code=' . $model->id);
             return false;
         }
 
         Tools::log()->error('Error: ' . $this->lastOpenSSLError);
+        return true;
+    }
+
+    /**
+     * Prueba la comunicación con DGII solicitando un token.
+     */
+    protected function testConexionAction(): bool
+    {
+        try {
+            $api = new \FacturaScripts\Plugins\eCF_GMV\Lib\DGII\DgiiApiService();
+            $token = $api->obtenerToken();
+            if ($token) {
+                Tools::log()->notice('¡Conexión con DGII exitosa! Token obtenido correctamente.');
+            }
+        } catch (\Exception $e) {
+            Tools::log()->error('Error de conexión con DGII: ' . $e->getMessage());
+        }
         return true;
     }
 

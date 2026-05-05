@@ -14,6 +14,9 @@ class ECFLog extends ModelClass
     public $peticion;
     public $respuesta;
     public $http_code;
+    public $xml_sin_firma;
+    public $xml_firmado;
+    public $idfacturaproveedor;
     public $fecha;
 
     public static function primaryColumn(): string { return 'id'; }
@@ -28,6 +31,9 @@ class ECFLog extends ModelClass
         $this->peticion   = '';
         $this->respuesta  = '';
         $this->http_code  = 0;
-        $this->fecha      = date('Y-m-d H:i:s');
+        $this->xml_sin_firma = '';
+        $this->xml_firmado   = '';
+        $this->idfacturaproveedor = null;
+        $this->fecha         = date('Y-m-d H:i:s');
     }
 }

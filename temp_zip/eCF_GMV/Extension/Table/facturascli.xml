@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table>
+    <column>
+        <name>ecf_xml_firmado</name>
+        <type>text</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>ecf_fecha_firma</name>
+        <type>timestamp without time zone</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>ecf_trackid</name>
+        <type>character varying(100)</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>ecf_estado_dgii</name>
+        <type>integer</type>
+        <null>YES</null>
+    </column>
+</table>

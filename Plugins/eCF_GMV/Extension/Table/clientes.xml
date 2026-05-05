@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Extension de la tabla 'clientes' para el plugin eCF_GMV.
+    Añade la URL de recepción B2B de cada cliente (para envío de ACECF).
+-->
+<table>
+    <column>
+        <name>url_recepcion_ecf</name>
+        <type>character varying(255)</type>
+        <null>YES</null>
+    </column>
+</table>

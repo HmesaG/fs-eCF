@@ -3,7 +3,6 @@
 namespace FacturaScripts\Plugins\eCF_GMV\Controller;
 
 use FacturaScripts\Core\Lib\ExtendedController\ListController;
-use FacturaScripts\Core\Tools;
 
 /**
  * Listado de registros de configuración e-CF.
@@ -25,10 +24,12 @@ class ListECFConfiguracion extends ListController
         return 'ECFConfiguracion';
     }
 
-    public function privateCore(&$response, $user, $permissions): void
+    public function privateCore(&$response, $user, $permissions)
     {
+        parent::privateCore($response, $user, $permissions);
         // Al haber solo un registro de configuración, redirigimos directamente al Edit
-        $this->redirect(Tools::url('EditECFConfiguracion', ['code' => 1]));
+        $this->redirect('EditECFConfiguracion?code=1');
+        return;
     }
 
     protected function createViews()

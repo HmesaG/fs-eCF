@@ -20,5 +20,10 @@
             <label>Pendientes</label>
             <controller>ListECFTrackingPendiente</controller>
         </item>
+        <item>
+            <name>aprobacion_comercial</name>
+            <label>Aprobación Comercial</label>
+            <controller>AprobacionComercial</controller>
+        </item>
     </item>
 </menu>

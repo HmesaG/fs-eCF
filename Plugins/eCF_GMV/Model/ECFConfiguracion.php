@@ -10,6 +10,8 @@ class ECFConfiguracion extends ModelClass
 
     public $id;
     public $ambiente;
+    public $rnc_emisor;
+    public $razon_social;
     public $url_base_testecf;
     public $url_base_ecf;
     public $url_rfce_test;
@@ -31,10 +33,12 @@ class ECFConfiguracion extends ModelClass
         parent::clear();
         $this->id                    = null;
         $this->ambiente              = 'TesteCF';
+        $this->rnc_emisor            = '';
+        $this->razon_social          = '';
         $this->url_base_testecf      = 'https://ecf.dgii.gov.do/TesteCF';
         $this->url_base_ecf          = 'https://ecf.dgii.gov.do/eCF';
         $this->url_rfce_test         = 'https://ecf.dgii.gov.do/TesteCF/api/FacturasConsumidor';
-        $this->url_rfce_prod         = 'https://fc.dgii.gov.do/TesteCF/api/FacturasConsumidor';
+        $this->url_rfce_prod         = 'https://fc.dgii.gov.do/api/FacturasConsumidor';
         $this->ruta_certificado_p12  = '';
         $this->password_certificado  = '';
         $this->timeout_segundos      = 30;
@@ -70,31 +74,48 @@ class ECFConfiguracion extends ModelClass
         // Forzamos siempre el ID 1
         $this->id = 1;
         $db = $this->db ?? new \FacturaScripts\Core\Base\DataBase();
-        
+
         // Limpieza de seguridad: borrar cualquier registro con ID > 1
         $db->exec("DELETE FROM " . self::tableName() . " WHERE id > 1");
-        
-        // Obtenemos los datos a guardar
-        $data = $this->testData();
-        $data['id'] = 1;
+
+        // Obtenemos los datos a guardar usando las propiedades públicas del modelo
+        $data = [
+            'id'                   => 1,
+            'ambiente'             => $this->ambiente,
+            'rnc_emisor'           => $this->rnc_emisor,
+            'razon_social'         => $this->razon_social,
+            'url_base_testecf'     => $this->url_base_testecf,
+            'url_base_ecf'         => $this->url_base_ecf,
+            'url_rfce_test'        => $this->url_rfce_test,
+            'url_rfce_prod'        => $this->url_rfce_prod,
+            'ruta_certificado_p12' => $this->ruta_certificado_p12,
+            'password_certificado' => $this->password_certificado,
+            'timeout_segundos'     => $this->timeout_segundos,
+            'reintentos_maximos'   => $this->reintentos_maximos,
+            'activo'               => $this->activo ? 1 : 0,
+            'cert_sujeto'          => $this->cert_sujeto,
+            'cert_emisor'          => $this->cert_emisor,
+            'cert_vencimiento'     => $this->cert_vencimiento,
+        ];
 
         // Comprobar si existe el ID 1
         $existe = $db->select("SELECT id FROM " . self::tableName() . " WHERE id = 1");
 
         if (!empty($existe)) {
-            // Si existe, actualizamos
-            unset($data['id']);
-            return $db->update(self::tableName(), $data, ['id' => 1]);
+            // Si existe, actualizamos (sin el campo id)
+            $dataUpdate = $data;
+            unset($dataUpdate['id']);
+            return $db->update(self::tableName(), $dataUpdate, ['id' => 1]);
         }
 
         // Si no existe, insertamos manualmente para garantizar el ID 1
         $columns = [];
-        $values = [];
+        $values  = [];
         foreach ($data as $key => $value) {
             $columns[] = $key;
-            $values[] = $db->escape($value);
+            $values[]  = $db->escape($value);
         }
-        
+
         $sql = "INSERT INTO " . self::tableName() . " (" . implode(',', $columns) . ") VALUES (" . implode(',', $values) . ")";
         return $db->exec($sql);
     }
@@ -111,4 +132,10 @@ class ECFConfiguracion extends ModelClass
         
         return parent::test();
     }
+
+    public function testData(): bool
+    {
+        return $this->test();
+    }
+
 }

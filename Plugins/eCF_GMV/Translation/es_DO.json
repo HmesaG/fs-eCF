@@ -2,5 +2,9 @@
     "ecf_gmv": "e-CF",
     "ecf_configuracion": "Configuración",
     "ecf_log": "Envíos",
-    "ecf_tracking_pendiente": "Pendientes"
+    "ecf_tracking_pendiente": "Pendientes",
+    "ecf-enviada-ok": "Factura %encf% enviada correctamente. Estado: %estado%.",
+    "ecf-error-envio": "Error al enviar a DGII: %mensaje%",
+    "ecf-factura-no-encontrada": "No se pudo cargar la factura %code%.",
+    "ecf-no-factura": "No se ha especificado el código de factura."
 }
