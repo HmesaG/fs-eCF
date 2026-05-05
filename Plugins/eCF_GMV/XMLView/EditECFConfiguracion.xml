@@ -77,5 +77,13 @@
                 <widget type="password" fieldname="password_certificado_modal"/>
             </column>
         </group>
+        <group name="verify-cert" title="Verificar Contraseña del Certificado" icon="fas fa-key">
+            <column name="verify-password" title="Contraseña del certificado .p12" numcolumns="12">
+                <widget type="password" fieldname="verify_password" required="true"/>
+            </column>
+            <column name="btn-verify" numcolumns="12">
+                <widget type="button" label="Verificar" action="verify-cert" color="primary"/>
+            </column>
+        </group>
     </modals>
 </view>

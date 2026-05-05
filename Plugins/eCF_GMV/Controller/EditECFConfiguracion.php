@@ -80,13 +80,14 @@ class EditECFConfiguracion extends EditController
             }
         }
 
-        // Botón para verificar el certificado con la contraseña actual
+        // Botón para verificar contraseña manualmente
         $this->addButton('EditECFConfiguracion', [
             'row'    => 'footer-actions',
-            'action' => 'test-cert',
-            'color'  => 'secondary',
-            'icon'   => 'fas fa-check-circle',
+            'action' => 'verify-cert',
+            'color'  => 'warning',
+            'icon'   => 'fas fa-key',
             'label'  => 'Verificar Contraseña',
+            'type'   => 'modal',
         ]);
 
         // Botón para abrir el modal de subida del certificado
@@ -112,6 +113,8 @@ class EditECFConfiguracion extends EditController
                 return $this->testCertificateAction();
             case 'test-conexion':
                 return $this->testConexionAction();
+            case 'verify-cert':
+                return $this->verifyCertificateAction();
         }
 
         return parent::execPreviousAction($action);
@@ -200,56 +203,67 @@ class EditECFConfiguracion extends EditController
      */
     protected function readCertificateInfo(string $p12Path, string $password = ''): array|false
     {
-        if (!function_exists('openssl_pkcs12_read')) {
-            $this->lastOpenSSLError = 'La extensión openssl no está disponible en PHP.';
-            return false;
-        }
-
         $fullPath = $this->getCertFullPath($p12Path);
         if (empty($fullPath) || !file_exists($fullPath)) {
             $this->lastOpenSSLError = 'Archivo no encontrado: ' . $fullPath;
             return false;
         }
 
-        $p12Data = file_get_contents($fullPath);
-        $this->lastOpenSSLError = '';
+        // Para OpenSSL 3.x - Usar legacy provider
+        $cmd = "openssl pkcs12 -in " . escapeshellarg($fullPath)
+             . " -passin pass:" . escapeshellarg($password)
+             . " -legacy -nodes -clcerts -nokeys 2>&1";
 
-        // INTENTO 1: PHP Extension con OPENSSL_CONF (Legacy Provider)
-        $cnfPath = FS_FOLDER . DIRECTORY_SEPARATOR . 'Plugins' . DIRECTORY_SEPARATOR . 'eCF_GMV' . DIRECTORY_SEPARATOR . 'openssl.cnf';
-        if (file_exists($cnfPath)) {
-            putenv("OPENSSL_CONF=" . $cnfPath);
-        }
-
-        $certs = [];
-        if (@openssl_pkcs12_read($p12Data, $certs, $password) && !empty($certs['cert'])) {
-            return $this->parseCertData($certs['cert']);
-        }
-
-        // INTENTO 2: Fallback vía Comando OpenSSL (Más robusto en Docker/OpenSSL 3.0)
-        $escapedPath = escapeshellarg($fullPath);
-        $escapedPass = escapeshellarg($password);
-        
-        // Comando para extraer el certificado en formato PEM usando legacy provider
-        $cmd = "openssl pkcs12 -in $escapedPath -passin pass:$escapedPass -nodes -legacy -clcerts -nokeys 2>&1";
         $output = shell_exec($cmd);
-        
+
         if ($output && strpos($output, '-----BEGIN CERTIFICATE-----') !== false) {
             if (preg_match('/-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----/s', $output, $matches)) {
                 return $this->parseCertData($matches[0]);
             }
         }
 
-        // Si falló todo, capturamos el error detallado
-        $sslError = '';
-        while ($msg = openssl_error_string()) { $sslError .= $msg . '; '; }
-        
-        if ($output) {
-            $cleanOutput = str_replace($password, '********', $output);
-            $sslError .= " [Shell Output]: " . trim($cleanOutput);
-        }
-        
-        $this->lastOpenSSLError = $sslError ?: 'Contraseña incorrecta o formato incompatible (DGII Legacy)';
+        $this->lastOpenSSLError = 'Contraseña incorrecta o certificado no válido. ' . substr((string)$output, 0, 500);
         return false;
+    }
+
+    /**
+     * Parsea un certificado en formato PEM para extraer info.
+     */
+    protected function verifyCertificateAction(): bool
+    {
+        $model = $this->getModel();
+        $fullPath = $this->getCertFullPath((string)$model->ruta_certificado_p12);
+
+        if (empty($model->ruta_certificado_p12)) {
+            Tools::log()->warning('No hay ningún certificado configurado.');
+            return true;
+        }
+
+        $password = $this->request->request->get('verify_password');
+
+        if (empty($password)) {
+            Tools::log()->warning('Debe ingresar una contraseña para verificar.');
+            return true;
+        }
+
+        // Probar la contraseña
+        $cmd = "openssl pkcs12 -in " . escapeshellarg($fullPath)
+             . " -passin pass:" . escapeshellarg($password)
+             . " -legacy -noout -info 2>&1";
+
+        $output = shell_exec($cmd);
+
+        if (strpos($output, 'MAC verified OK') !== false || strpos($output, 'PKCS7') !== false) {
+            Tools::log()->notice('✓ CONTRASEÑA CORRECTA. El certificado es válido.');
+        } elseif (strpos($output, 'mac verify failure') !== false) {
+            Tools::log()->error('✗ CONTRASEÑA INCORRECTA. Verifique la contraseña del certificado.');
+        } elseif (strpos($output, 'unsupported') !== false) {
+            Tools::log()->error('✗ Error de OpenSSL: El certificado usa algoritmos no soportados.');
+        } else {
+            Tools::log()->error('✗ Error desconocido: ' . substr((string)$output, 0, 200));
+        }
+
+        return true;
     }
 
     /**
