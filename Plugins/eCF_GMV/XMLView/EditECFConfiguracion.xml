@@ -47,11 +47,8 @@
     </rows>
     <modals>
         <group name="upload-cert" title="Subir Certificado Digital .p12" icon="fas fa-upload">
-            <column name="cert-file" title="Seleccionar archivo .p12" numcolumns="8">
-                <widget type="file" fieldname="cert_file" accept=".p12"/>
-            </column>
-            <column name="pass-cert-modal" title="Password del Certificado" numcolumns="4">
-                <widget type="password" fieldname="password_certificado_modal"/>
+            <column name="cert-file" title="Seleccionar archivo .p12" numcolumns="12">
+                <widget type="file" fieldname="cert_file" accept=".p12" required="true"/>
             </column>
         </group>
         <group name="verify-cert" title="Verificar Contraseña del Certificado" icon="fas fa-key">
