@@ -2,43 +2,20 @@
 <view>
     <columns>
         <group name="general" title="Configuración e-CF" numcolumns="12">
-            <column name="id" numcolumns="2" order="100">
-                <widget type="number" fieldname="id" icon="fa-solid fa-hashtag" readonly="dinamic"/>
-            </column>
-            <column name="activo" numcolumns="2" order="110">
+            <column name="activo" numcolumns="2" order="100">
                 <widget type="checkbox" fieldname="activo"/>
             </column>
-            <column name="ambiente" numcolumns="4" order="120">
+            <column name="ambiente" numcolumns="4" order="110">
                 <widget type="select" fieldname="ambiente">
                     <values title="TesteCF" ref="TesteCF"/>
                     <values title="eCF (Producción)" ref="eCF"/>
                 </widget>
             </column>
-            <column name="rnc-emisor" title="RNC Emisor" numcolumns="2" order="125">
+            <column name="rnc-emisor" title="RNC Emisor" numcolumns="2" order="120">
                 <widget type="text" fieldname="rnc_emisor" icon="fa-solid fa-id-card"/>
             </column>
-            <column name="razon-social" title="Razón Social" numcolumns="4" order="127">
+            <column name="razon-social" title="Razón Social" numcolumns="4" order="130">
                 <widget type="text" fieldname="razon_social" icon="fa-solid fa-building"/>
-            </column>
-            <column name="timeout" title="Timeout (seg)" numcolumns="2" order="130">
-                <widget type="number" fieldname="timeout_segundos"/>
-            </column>
-            <column name="reintentos" title="Reintentos Máx." numcolumns="2" order="140">
-                <widget type="number" fieldname="reintentos_maximos"/>
-            </column>
-        </group>
-        <group name="urls" title="URLs DGII" numcolumns="12">
-            <column name="url-test" title="URL Base Test e-CF" numcolumns="6" order="100">
-                <widget type="text" fieldname="url_base_testecf"/>
-            </column>
-            <column name="url-prod" title="URL Base e-CF (Prod)" numcolumns="6" order="110">
-                <widget type="text" fieldname="url_base_ecf"/>
-            </column>
-            <column name="url-rfce-test" title="URL RFCE Test" numcolumns="6" order="120">
-                <widget type="text" fieldname="url_rfce_test"/>
-            </column>
-            <column name="url-rfce-prod" title="URL RFCE Prod" numcolumns="6" order="130">
-                <widget type="text" fieldname="url_rfce_prod"/>
             </column>
         </group>
         <group name="certificado" title="Certificado Digital" numcolumns="12">
