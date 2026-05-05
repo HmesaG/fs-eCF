@@ -29,21 +29,23 @@ class EditECFConfiguracion extends EditController
 
     public function privateCore(&$response, $user, $permissions)
     {
-        $currentCode = $this->request->query->get('code') ?? $this->request->request->get('code');
-        
-        // Si no hay código o no es 1, intentamos cargar el registro 1
+        // FORZAR QUE EXISTA EL REGISTRO ID 1 ANTES DE CUALQUIER COSA
+        $model = new \FacturaScripts\Plugins\eCF_GMV\Model\ECFConfiguracion();
+        $existe = $model->get(1);
+
+        if (false === $existe) {
+            // Crear registro por defecto
+            $model->id = 1;
+            $model->ambiente = 'TesteCF';
+            $model->activo = false;
+            $model->rnc_emisor = '';
+            $model->razon_social = '';
+            $model->save();
+        }
+
+        // Forzar code=1 en la URL
+        $currentCode = $this->request->query->get('code');
         if ($currentCode != 1) {
-            $model = new \FacturaScripts\Plugins\eCF_GMV\Model\ECFConfiguracion();
-            $config = $model->getConfiguracion();
-            
-            if (false === $config) {
-                // Si no existe ni el 1, lo creamos
-                $model->id = 1;
-                $model->ambiente = 'TesteCF';
-                $model->save();
-            }
-            
-            // Redirigir siempre a code=1
             $this->redirect('EditECFConfiguracion?code=1');
             return;
         }
