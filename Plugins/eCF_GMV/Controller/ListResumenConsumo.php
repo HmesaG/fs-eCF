@@ -36,11 +36,25 @@ class ListResumenConsumo extends ListController
      */
     protected function loadData($viewName, $view)
     {
-        switch ($viewName) {
-            case 'ListResumenConsumo':
-                $this->views[$viewName]->data = DgiiResumenServicio::getPendientes();
-                break;
+        if ($viewName !== 'ListResumenConsumo') {
+            return;
         }
+
+        $datos = DgiiResumenServicio::getPendientes();
+
+        $view->setItems([], 0);
+
+        foreach ($datos as $item) {
+            $nuevoModelo = clone $view->model;
+            foreach ($item as $campo => $valor) {
+                if (property_exists($nuevoModelo, $campo)) {
+                    $nuevoModelo->$campo = $valor;
+                }
+            }
+            $view->addItem($nuevoModelo);
+        }
+
+        $view->count = count($datos);
     }
 
     protected function execPreviousAction($action): bool
