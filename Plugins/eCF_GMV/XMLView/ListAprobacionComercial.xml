@@ -3,25 +3,19 @@
     <columns>
         <column>
             <title>Fecha</title>
-            <field>fecha</field>
-            <type>datetime</type>
-            <width>150</width>
+            <widget fieldname="fecha" type="datetime" width="150" />
         </column>
         <column>
             <title>Emisor | eNCF</title>
-            <field>referencia</field>
-            <type>string</type>
+            <widget fieldname="referencia" type="text" />
         </column>
         <column>
             <title>Factura Compra</title>
-            <field>idfacturaproveedor</field>
-            <type>string</type>
-            <link>EditFacturaProveedor</link>
+            <widget fieldname="idfacturaproveedor" type="text" link="EditFacturaProveedor" />
         </column>
         <column>
             <title>Estado API</title>
-            <field>respuesta</field>
-            <type>string</type>
+            <widget fieldname="respuesta" type="text" />
         </column>
     </columns>
 </view>
