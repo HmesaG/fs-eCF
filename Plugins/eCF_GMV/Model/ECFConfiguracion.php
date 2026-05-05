@@ -66,74 +66,65 @@ class ECFConfiguracion extends ModelClass
 
     public function save(): bool
     {
-        // Ejecutamos validaciones previas
         if (false === $this->test()) {
             return false;
         }
 
-        // Forzamos siempre el ID 1
         $this->id = 1;
-        $db = $this->db ?? new \FacturaScripts\Core\Base\DataBase();
 
-        // Limpieza de seguridad: borrar cualquier registro con ID > 1
-        $db->exec("DELETE FROM " . self::tableName() . " WHERE id > 1");
+        // Eliminar registros con ID > 1
+        $this->db->exec("DELETE FROM " . self::tableName() . " WHERE id > 1");
 
-        // Preparar datos a guardar
-        $data = [
-            'id'                   => 1,
-            'ambiente'             => $this->ambiente,
-            'rnc_emisor'           => $this->rnc_emisor,
-            'razon_social'         => $this->razon_social,
-            'url_base_testecf'     => $this->url_base_testecf,
-            'url_base_ecf'         => $this->url_base_ecf,
-            'url_rfce_test'        => $this->url_rfce_test,
-            'url_rfce_prod'        => $this->url_rfce_prod,
-            'ruta_certificado_p12' => $this->ruta_certificado_p12,
-            'password_certificado' => $this->password_certificado,
-            'timeout_segundos'     => $this->timeout_segundos,
-            'reintentos_maximos'   => $this->reintentos_maximos,
-            'activo'               => $this->activo ? 1 : 0,
-            'cert_sujeto'          => $this->cert_sujeto,
-            'cert_emisor'          => $this->cert_emisor,
-            'cert_vencimiento'     => $this->cert_vencimiento,
-        ];
-
-        // Verificar si existe el ID 1
-        $existe = $db->select("SELECT id FROM " . self::tableName() . " WHERE id = 1");
+        $existe = $this->db->select("SELECT id FROM " . self::tableName() . " WHERE id = 1");
 
         if (!empty($existe)) {
-            // ACTUALIZAR - Construir SQL manualmente
+            // UPDATE usando exec() con valores escapados manualmente
             $sql = "UPDATE " . self::tableName() . " SET "
-                . "ambiente = " . $db->escape($this->ambiente) . ", "
-                . "rnc_emisor = " . $db->escape($this->rnc_emisor) . ", "
-                . "razon_social = " . $db->escape($this->razon_social) . ", "
-                . "url_base_testecf = " . $db->escape($this->url_base_testecf) . ", "
-                . "url_base_ecf = " . $db->escape($this->url_base_ecf) . ", "
-                . "url_rfce_test = " . $db->escape($this->url_rfce_test) . ", "
-                . "url_rfce_prod = " . $db->escape($this->url_rfce_prod) . ", "
-                . "ruta_certificado_p12 = " . $db->escape($this->ruta_certificado_p12) . ", "
-                . "password_certificado = " . $db->escape($this->password_certificado) . ", "
-                . "timeout_segundos = " . $db->escape($this->timeout_segundos) . ", "
-                . "reintentos_maximos = " . $db->escape($this->reintentos_maximos) . ", "
+                . "ambiente = '" . addslashes($this->ambiente) . "', "
+                . "rnc_emisor = '" . addslashes($this->rnc_emisor) . "', "
+                . "razon_social = '" . addslashes($this->razon_social) . "', "
+                . "url_base_testecf = '" . addslashes($this->url_base_testecf) . "', "
+                . "url_base_ecf = '" . addslashes($this->url_base_ecf) . "', "
+                . "url_rfce_test = '" . addslashes($this->url_rfce_test) . "', "
+                . "url_rfce_prod = '" . addslashes($this->url_rfce_prod) . "', "
+                . "ruta_certificado_p12 = '" . addslashes($this->ruta_certificado_p12) . "', "
+                . "password_certificado = '" . addslashes($this->password_certificado) . "', "
+                . "timeout_segundos = " . intval($this->timeout_segundos) . ", "
+                . "reintentos_maximos = " . intval($this->reintentos_maximos) . ", "
                 . "activo = " . ($this->activo ? 1 : 0) . ", "
-                . "cert_sujeto = " . $db->escape($this->cert_sujeto) . ", "
-                . "cert_emisor = " . $db->escape($this->cert_emisor) . ", "
-                . "cert_vencimiento = " . $db->escape($this->cert_vencimiento)
-                . " WHERE id = 1";
+                . "cert_sujeto = '" . addslashes($this->cert_sujeto) . "', "
+                . "cert_emisor = '" . addslashes($this->cert_emisor) . "', "
+                . "cert_vencimiento = '" . addslashes($this->cert_vencimiento) . "' "
+                . "WHERE id = 1";
 
-            return $db->exec($sql);
+            return $this->db->exec($sql);
         }
 
-        // INSERTAR - Si no existe
-        $columns = [];
-        $values = [];
-        foreach ($data as $key => $value) {
-            $columns[] = $key;
-            $values[] = $db->escape($value);
-        }
+        // INSERT
+        $sql = "INSERT INTO " . self::tableName() . " (
+            id, ambiente, rnc_emisor, razon_social, url_base_testecf, url_base_ecf,
+            url_rfce_test, url_rfce_prod, ruta_certificado_p12, password_certificado,
+            timeout_segundos, reintentos_maximos, activo, cert_sujeto, cert_emisor, cert_vencimiento
+        ) VALUES (
+            1,
+            '" . addslashes($this->ambiente) . "',
+            '" . addslashes($this->rnc_emisor) . "',
+            '" . addslashes($this->razon_social) . "',
+            '" . addslashes($this->url_base_testecf) . "',
+            '" . addslashes($this->url_base_ecf) . "',
+            '" . addslashes($this->url_rfce_test) . "',
+            '" . addslashes($this->url_rfce_prod) . "',
+            '" . addslashes($this->ruta_certificado_p12) . "',
+            '" . addslashes($this->password_certificado) . "',
+            " . intval($this->timeout_segundos) . ",
+            " . intval($this->reintentos_maximos) . ",
+            " . ($this->activo ? 1 : 0) . ",
+            '" . addslashes($this->cert_sujeto) . "',
+            '" . addslashes($this->cert_emisor) . "',
+            '" . addslashes($this->cert_vencimiento) . "'
+        )";
 
-        $sql = "INSERT INTO " . self::tableName() . " (" . implode(',', $columns) . ") VALUES (" . implode(',', $values) . ")";
-        return $db->exec($sql);
+        return $this->db->exec($sql);
     }
 
     public function test(): bool

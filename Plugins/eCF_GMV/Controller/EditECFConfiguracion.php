@@ -95,7 +95,7 @@ class EditECFConfiguracion extends EditController
             'action' => 'upload-cert',
             'color'  => 'info',
             'icon'   => 'fas fa-upload',
-            'label'  => 'Subir Certificado .p12',
+            'label'  => 'Subir Certificado Digital .p12',
             'type'   => 'modal',
         ]);
     }

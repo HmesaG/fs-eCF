@@ -42,7 +42,7 @@
             </column>
         </group>
         <group name="certificado" title="Certificado Digital" numcolumns="12">
-            <column name="ruta-cert" title="Ruta Certificado .p12" numcolumns="8" order="100">
+            <column name="ruta-cert" title="Ruta Certificado Digital .p12" numcolumns="8" order="100">
                 <widget type="text" fieldname="ruta_certificado_p12" icon="fa-solid fa-file-certificate" readonly="true"/>
             </column>
             <column name="pass-cert" title="Password Certificado" numcolumns="4" order="110">
