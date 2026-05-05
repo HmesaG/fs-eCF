@@ -56,7 +56,7 @@
                 <widget type="password" fieldname="verify_password" required="true"/>
             </column>
             <column name="btn-verify" numcolumns="12">
-                <widget type="button" label="Verificar" action="verify-cert" color="primary"/>
+                <widget type="button" fieldname="btn_verify" label="Verificar" action="verify-cert" color="primary"/>
             </column>
         </group>
     </modals>
